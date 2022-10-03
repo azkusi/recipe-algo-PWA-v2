@@ -1,0 +1,106 @@
+{
+    "recipe-number": 3,
+
+    "name": "chicken pad thai", 
+
+    "retrieval-steps":[
+        {"instruction": "retrieve sliced chicken breast from fridge",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "retrieve shallot, garlic and ginger",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "retrieve prawns bean sprouts and chillies",
+        "step-number": 3,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        }
+    ],
+
+    "prep-steps":[
+        {"instruction": "Beat 2 eggs in a bowl",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []     
+        }
+    ],
+
+    "oven-steps":[
+        {"instruction": "Place chicken breast pieces in oven",
+        "step-number": 1,
+        "duration": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []     
+        }
+    ],
+
+    "base-steps":[
+        {"instruction": "Boil 1 packet of noodles in a bowl",
+        "step-number": 1,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []
+        }
+    ],
+
+    "stove-steps":[
+        {"instruction": "Place wok on stove on medium heat",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "duration": 0.1,
+        "step-dependency": []            
+        },
+        {"instruction": "Add oil, shallot, garlic and ginger to wok",
+        "step-number": 2,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1]            
+        },
+        {"instruction": "Add prawns and chicken",
+        "step-number": 3,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2]            
+        },
+        {"instruction": "Add noodles and bean sprouts and stir",
+        "step-number": 4,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3]            
+        },
+        {"instruction": "Add tamarind paste, fish and soy sauce and mix, leave to cook",
+        "step-number": 5,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4]            
+        },
+        {"instruction": "Add pepper and lime juice, and mix, then leave to cook",
+        "step-number": 6,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5]
+        },
+        {"instruction": "Add beaten eggs, mix and leave to cook",
+        "step-number": 7,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6]
+        },
+        {"instruction": "Stir the wok to mix all the egg",
+        "step-number": 8,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7]
+        },
+        {"instruction": "Turn off hob and remove chillis",
+        "step-number": 9,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8]
+        }
+    ]
+}

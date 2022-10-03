@@ -1,0 +1,32 @@
+{
+    "number": 1,
+    "name": "test",
+    "stage1-steps": [
+        {
+            "instruction1": "action",
+            "instruction2": "action2",
+            "instruction3": "action3",
+            "instruction4": "action4"
+
+        }
+    ],
+    "stage2-steps": [
+        {
+            "instruction1": "action",
+            "instruction2": "action2",
+            "instruction3": "action3",
+            "instruction4": "action4"
+
+        }
+    ],
+    "stage3-steps": [
+        {
+            "instruction1": "action",
+            "instruction2": "action2",
+            "instruction3": "action3",
+            "instruction4": "action4"
+
+        }
+    ]
+
+}

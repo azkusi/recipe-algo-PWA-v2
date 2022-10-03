@@ -1,0 +1,92 @@
+{
+    "recipe-number": 2,
+
+    "name": "jackfruit stew", 
+    "retrieval-steps":[
+        {"instruction": "retrieve 1 chopped brown onion from fridge",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "retrieve half a scotch bonnet",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "retrieve one green pepper and one red pepper",
+        "step-number": 3,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        }
+    ],
+
+    "prep-steps":[],
+
+    "oven-steps":[],
+
+    "base-steps":[
+        {"instruction":"Boil 3 cups of rice in rice cooker",
+        "step-number": 1,
+        "duration": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []
+        }
+    ],
+
+    "stove-steps":[
+        {"instruction": "Boil jackfruit",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "duration": 0.1,
+        "step-dependency": []            
+        },
+        {"instruction": "Drain well and pull into shreds using a fork",
+        "step-number": 2,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1]            
+        },
+        {"instruction": "Season with the salt, black pepper, paprika, thyme and allspice and mix together",
+        "step-number": 3,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2]            
+        },
+        {"instruction": "Heat the oil in a frying pan over a medium heat",
+        "step-number": 4,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3]            
+        },
+        {"instruction": "Add the onion and garlic and leave to cook",
+        "step-number": 5,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4]            
+        },
+        {"instruction": "Add the tomatoes and coconut milk and mix together",
+        "step-number": 6,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5]
+        },
+        {"instruction": "Add the whole chilli and leave to cook",
+        "step-number": 7,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6]
+        },
+        {"instruction": "Add the peppers, vegetable stock and jackfruit and leave to cook",
+        "step-number": 8,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7]
+        },
+        {"instruction": "Turn off hob and remove chillis",
+        "step-number": 9,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8]
+        }
+    ]
+}

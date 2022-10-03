@@ -1,0 +1,53 @@
+{
+    "recipe-number": 4,
+
+    "name": "jerk chicken", 
+
+    "retrieval-steps":[
+        {"instruction": "retrieve chicken pieces from fridge",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "retrieve jerk sauce ingredients",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        }
+    ],
+
+    "prep-steps":[
+        {"instruction": "Put jerk sauce ingredients into bowl and mix",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []     
+        },
+        {"instruction": "Pour marinade over chicken",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1]     
+        }
+    ],
+
+    "oven-steps":[
+        {"instruction": "Place chicken pieces in oven",
+        "step-number": 1,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []     
+        }
+    ],
+
+    "base-steps":[
+        {"instruction": "Boil 3 cups of rice on the rice cooker",
+        "step-number": 1,
+        "duration": 0.1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []
+        }
+    ],
+
+    "stove-steps":[
+
+    ]
+}
