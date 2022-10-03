@@ -1012,7 +1012,7 @@ function ChefAlgo() {
                                         <br/>
                                         <br/>
 
-                                        {completed_steps.length > 0 && 
+                                        {/* {completed_steps.length > 0 && 
                                         <div>
                                             <h3>Previous Step:</h3>
                                             {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
@@ -1030,7 +1030,7 @@ function ChefAlgo() {
                                             }
                                             
                                         </div>
-                                        }
+                                        } */}
                                     </div>
                                     :
                                     <div>
@@ -1039,7 +1039,7 @@ function ChefAlgo() {
                                         <br/>
                                         <br/>
 
-                                        {completed_steps.length > 0 && 
+                                        {/* {completed_steps.length > 0 && 
                                         <div>
                                             <h3>Previous Step:</h3>
                                                 {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
@@ -1056,7 +1056,7 @@ function ChefAlgo() {
                                                 
                                                 }
                                         </div>
-                                        }
+                                        } */}
                                     </div>
                                     
                                     
@@ -1070,7 +1070,7 @@ function ChefAlgo() {
                               <br/>
                               <br/>
 
-                            {completed_steps.length > 0 && 
+                            {/* {completed_steps.length > 0 && 
                             <div>
                                 <h3>Previous Step:</h3>
                                 {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
@@ -1086,7 +1086,7 @@ function ChefAlgo() {
                                     </div>
                                     
                                 }
-                            </div>}
+                            </div>} */}
                             </div>
                             
                                 
@@ -1247,7 +1247,7 @@ function ChefAlgo() {
                     </Container>
                 </Row>
 
-                <Row>
+                {/* <Row>
                     <h3>Previous Instruction:</h3>
                     {(consecutive_back_presses >= 0 && completed_steps.length > 0) ?    
                         <div>
@@ -1266,7 +1266,7 @@ function ChefAlgo() {
                         )
                         
                     }
-                </Row>
+                </Row> */}
     
             </div>
                 
