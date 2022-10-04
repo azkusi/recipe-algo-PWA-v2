@@ -1034,7 +1034,7 @@ function ChefAlgo() {
                                     </div>
                                     :
                                     <div>
-                                        <h3>Loading next steps...</h3>
+                                        <h3>Stir all pots while awaiting next steps...</h3>
                                         <br/>
                                         <br/>
                                         <br/>
