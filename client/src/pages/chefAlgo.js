@@ -117,6 +117,13 @@ function ChefAlgo() {
     const pre_prep = ["Instruction1", "Instruction2", "Instruction3", "Instrucntion4"]
 
 
+    useEffect(()=>{
+        if(window.innerWidth < 700){
+            window.alert("Please use this app on a tablet to avoid design breakages")
+        }
+    },[])
+    
+
     //=====================================================
     //       USE EFFECT HOOK FOR PLAYING AUDIO WHEN NEW 
     //      STEP IS SHOWN ON SCREEN 
@@ -1098,6 +1105,42 @@ function ChefAlgo() {
             </Container>
             
         );
+    }
+
+    //=====================================================
+    //   IF JUST STARTING TELL USER TO CLICK START
+    //=====================================================
+
+    else if(stage === null){
+        return(
+            <div style={{"padding": "15px"}} >
+                <h1 style={{"color": "#FF9F33"}}>Demo</h1>                
+                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
+                    <Col>
+                        <h1>Press Start button to begin</h1>
+                    </Col>
+                </Row>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <Row>
+                    <Col>
+                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button onClick={()=>{
+                            setStage('LOAD')
+                            set_app_starting(true)
+                            set_instruction_stage(instruction_stage + 1)
+                            set_recipe_cycle_number(recipe_cycle_number + 1)
+                            // program()
+                            
+                            setNextClick(true)
+                            }}> Start 
+                        </Button>
+                        }
+                    </Col>
+                </Row>
+            </div>
+        )
     }
 
     //=====================================================
