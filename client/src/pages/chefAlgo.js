@@ -1,7 +1,5 @@
-// import * as recipe1 from '../recipe1.json';
-// import * as recipe2 from '../recipe2.json';
-// import * as recipe3 from '../recipe3.json';
-// import * as recipe4 from '../recipe4.json';
+import Button from '@mui/material/Button';
+
 
 import mixing_bowl from '../images/mixing_bowl.jpg';
 import Black_Circle from '../images/Black_Circle.jpeg'
@@ -11,7 +9,7 @@ import NotificationSound from '../sounds/NotificationSound.mp3';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button'
+// import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner';
 
 
@@ -807,7 +805,7 @@ function ChefAlgo() {
                     </Col>
 
                     <Col>
-                        <Button onClick={()=>{
+                        <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                             setStage("LOAD")
                             set_app_starting(true)
                             set_instruction_stage(instruction_stage + 1)
@@ -847,7 +845,7 @@ function ChefAlgo() {
                             (to_do_steps["steps"].length > 0) && 
                             <div>
 
-                                <Button onClick={()=>{
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                                     console.log("======================================")
                                     console.log("BACK BUTTON PRESSED")
                                     console.log("======================================")
@@ -855,7 +853,7 @@ function ChefAlgo() {
                                     }}>
                                     Back
                                 </Button>
-                                <Button style={{"margin": "auto 0"}} onClick={()=>{
+                                <Button style={{"margin": "10px"}} variant="contained" style={{"margin": "auto 0"}} onClick={()=>{
 
                                     if(consecutive_back_presses >= 0){
                                         set_consecutive_back_presses(consecutive_back_presses - 1)
@@ -1135,7 +1133,7 @@ function ChefAlgo() {
                 <br/>
                 <Row>
                     <Col>
-                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button onClick={()=>{
+                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                             setStage('LOAD')
                             set_app_starting(true)
                             set_instruction_stage(instruction_stage + 1)
@@ -1182,7 +1180,7 @@ function ChefAlgo() {
                         {instruction_stage > 0 && 
                             <div>
 
-                                <Button onClick={()=>{
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                                     console.log("======================================")
                                     console.log("BACK BUTTON PRESSED")
                                     console.log("======================================")
@@ -1190,7 +1188,7 @@ function ChefAlgo() {
                                     }}>
                                     Back
                                 </Button>
-                                <Button onClick={()=>{
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                                     if(consecutive_back_presses >= 0){
                                         set_consecutive_back_presses(consecutive_back_presses - 1)
                                     }else{
@@ -1213,7 +1211,7 @@ function ChefAlgo() {
 
 
 
-                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button onClick={()=>{
+                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                             setStage('LOAD')
                             set_app_starting(true)
                             set_instruction_stage(instruction_stage + 1)
