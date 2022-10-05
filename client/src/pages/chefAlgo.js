@@ -941,6 +941,7 @@ function ChefAlgo() {
                                 <Col style={{"border": "solid", "backgroundColor": background_colour_1}}>
                                     {recipe_1_upcoming.length > 0 ? <h2>{recipe_1_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_1_timer} secs...</h5> : null} */}
+                                    {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/60)) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_1_timer / 60) : '00'}:{ 59 >= (recipe_1_timer) ? (recipe_1_timer) : '00'}</h5> : null} */}
                                     {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/60)) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_1_timer / 60) : '00'}:{ 59 >= (recipe_1_timer) ? (recipe_1_timer) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
@@ -950,6 +951,7 @@ function ChefAlgo() {
                                     <div>
                                         {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                         {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
+                                        {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null} */}
                                         {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null}
 
                                     </div>
@@ -967,6 +969,7 @@ function ChefAlgo() {
                                 <Col style={{"border": "solid", "backgroundColor": background_colour_3}}>
                                     {recipe_3_upcoming.length > 0 ? <h2>{recipe_3_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_3_timer} secs...</h5> : null}                                     */}
+                                    {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/60)) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (recipe_3_timer / 60) : '00'}:{ 59 >= (recipe_3_timer) ? (recipe_3_timer) : '00'}</h5> : null} */}
                                     {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/60)) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (recipe_3_timer / 60) : '00'}:{ 59 >= (recipe_3_timer) ? (recipe_3_timer) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
@@ -975,6 +978,7 @@ function ChefAlgo() {
                                 <Col style={{"border": "solid", "backgroundColor": background_colour_4}}>
                                     {recipe_4_upcoming.length > 0 ? <h2>{recipe_4_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_4_timer} secs...</h5> : null} */}
+                                    {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/60)) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (recipe_4_timer / 60) : '00'}:{ 59 >= (recipe_4_timer) ? (recipe_4_timer) : '00'}</h5> : null} */}
                                     {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/60)) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (recipe_4_timer / 60) : '00'}:{ 59 >= (recipe_4_timer) ? (recipe_4_timer) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />

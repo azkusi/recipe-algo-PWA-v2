@@ -934,7 +934,7 @@ function Demo() {
                                     <div>
                                         {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                         {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
-                                        {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null}
+                                        {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null}
 
                                     </div>
 
