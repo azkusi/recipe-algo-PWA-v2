@@ -91,7 +91,7 @@ function Demo() {
     
     
 
-    const current_instruction_object = useBackgroundFunc().current_instruction_object
+    const [current_instruction_object, set_current_instruction_object] = useState(null)
 
     const on_screen_instruction_stove_sec = useBackgroundFunc().on_screen_instruction
     const current_recipe_name_stove_sec = useBackgroundFunc().current_recipe_name
@@ -438,6 +438,7 @@ function Demo() {
 
             set_current_recipe_name(recipes[recipe_cycle_number]["name"])
             set_on_screen_instruction(recipes[recipe_cycle_number]["retrieval-steps"][instruction_stage - 1]["instruction"])
+            set_current_instruction_object(recipes[recipe_cycle_number]["retrieval-steps"][instruction_stage - 1])
 
         }else{
             if(recipe_cycle_number < recipe_total){
@@ -465,6 +466,7 @@ function Demo() {
             
             set_current_recipe_name(recipes[recipe_cycle_number]["name"])
             set_on_screen_instruction(recipes[recipe_cycle_number]["prep-steps"][instruction_stage - 1]["instruction"])
+            set_current_instruction_object(recipes[recipe_cycle_number]["prep-steps"][instruction_stage - 1])
 
         }else{
             if(recipe_cycle_number < recipe_total){
@@ -492,7 +494,7 @@ function Demo() {
             
             set_current_recipe_name(recipes[recipe_cycle_number]["name"])
             set_on_screen_instruction(recipes[recipe_cycle_number]["oven-steps"][instruction_stage - 1]["instruction"])
-
+            set_current_instruction_object(recipes[recipe_cycle_number]["oven-steps"][instruction_stage - 1])
         }else{
             if(recipe_cycle_number < recipe_total){
                 set_recipe_cycle_number(recipe_cycle_number + 1)
@@ -518,7 +520,7 @@ function Demo() {
             
             set_current_recipe_name(recipes[recipe_cycle_number]["name"])
             set_on_screen_instruction(recipes[recipe_cycle_number]["base-steps"][instruction_stage - 1]["instruction"])
-
+            set_current_instruction_object(recipes[recipe_cycle_number]["base-steps"][instruction_stage - 1])
         }else{
             if(recipe_cycle_number < recipe_total){
                 set_recipe_cycle_number(recipe_cycle_number + 1)
