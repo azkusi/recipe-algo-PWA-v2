@@ -1,0 +1,220 @@
+{
+    "recipe-number": 1,
+    "name": "Chicken Pad Thai", 
+    "base-steps":[
+        {"instruction":"Soak 150g of flat rice noodles in boiling water till softened, then drain water",
+        "step-number": 1,
+        "duration": 0.5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []
+        }
+    ],
+    "retrieval-steps":[
+        {"instruction": "Retrieve 1 garlic",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve 1 red chilli",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve 2 chicken breasts",
+        "step-number": 3,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve half a pack of coriander",
+        "step-number": 4,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve 1 spring onion",
+        "step-number": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve chicken stock",
+        "step-number": 6,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve bean sprouts",
+        "step-number": 7,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve 2 eggs",
+        "step-number": 8,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve soy sauce",
+        "step-number": 9,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve tamarind paste",
+        "step-number": 10,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve fish sauce",
+        "step-number": 11,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve soft sugar",
+        "step-number": 12,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Retrieve one lime",
+        "step-number": 13,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        }
+    ],
+
+    "prep-steps":[
+        {"instruction": "Crush 2 garlic cloves into small pieces",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Finely slice 1 red chilli into small pieces",
+        "step-number": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Finely slice 2 chicken breasts",
+        "step-number": 3,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Finely slice half a pack of coriander leaves",
+        "step-number": 4,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Shred/finely slice one spring onion",
+        "step-number": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Grab a small bowl and place 2 tablespoons of tamarind paste",
+        "step-number": 6,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Place 2 tablespoons of fish sauce into the bowl",
+        "step-number": 7,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Place 1 tablespoon of ligh brown sugar into the bowl",
+        "step-number": 8,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Squeeze juice from half of a lime into the bowl",
+        "step-number": 9,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Place half a tablespoon of siracha into the bowl sauce",
+        "step-number": 10,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Transfer all chopped ingredients to one plate keeping each ingredient separate",
+        "step-number": 11,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        },
+        {"instruction": "Together, place the plate and the small bowl used for this recipe aside for now",
+        "step-number": 12,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []            
+        }
+    ],
+
+    "oven-steps":[],
+
+    "stove-steps":[
+        {"instruction": "Heat the sunflower oil in a frying pan/wok over a medium heat for 1 minute",
+        "step-number": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "duration": 1,
+        "step-dependency": []            
+        },
+        {"instruction": "Add the garlic and chilli pieces and fry for 30 seconds",
+        "step-number": 2,
+        "duration": 0.5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1]            
+        },
+        {"instruction": "Add the chicken pieces and fry for 5 minutes",
+        "step-number": 3,
+        "duration": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2]            
+        },
+        {"instruction": "Add the coriander and spring onions pieces to fry for 1 min",
+        "step-number": 4,
+        "duration": 1,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3]            
+        },
+        {"instruction": "Add in the soaked noodles, 50ml of the chicken stock and the soy sauce - leave to fry for 5 mins",
+        "step-number": 5,
+        "duration": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4]            
+        },
+        {"instruction": "Add the prepared sauce in the bowl and leave to fry for 5 mins",
+        "step-number": 6,
+        "duration": 5,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5]
+        },
+        {"instruction": "Mix in 100g of beansprouts, leave to fry for 2 mins",
+        "step-number": 7,
+        "duration": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6]
+        },
+        {"instruction": "Push everything to one half of the pan/wok and pour the beaten eggs into the other half of the wok - leave for 1 minute",
+        "step-number": 8,
+        "duration": 1,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7]
+        },
+        {"instruction": "Scramble the eggs and keep frying for 2 more minutes",
+        "step-number": 9,
+        "duration": 2,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8]
+        },
+        {"instruction": "Mix the eggs in with the noodles",
+        "step-number": 10,
+        "duration": 0,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        },
+        {"instruction": "Turn off the hob",
+        "step-number": 11,
+        "duration": 0.1,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {"instruction": "Ready to serve",
+        "step-number": 12,
+        "duration": 0,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        }
+        
+    ]
+}

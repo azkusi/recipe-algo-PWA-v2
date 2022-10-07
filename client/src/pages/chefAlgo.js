@@ -3,20 +3,20 @@ import Button from '@mui/material/Button';
 
 import mixing_bowl from '../images/mixing_bowl.jpg';
 import Black_Circle from '../images/Black_Circle.jpeg'
+import chopping_board1 from '../images/chopping_board1.jpeg'
+import chopping_board2 from '../images/chopping_board2.jpeg'
+import chopping_board3 from '../images/chopping_board3.jpeg'
 
-import NotificationSound from '../sounds/NotificationSound.mp3';
+
+import NewNotification from '../sounds/NewNotification.mp3';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 // import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner';
+import Card from '@mui/material/Card';
 
-
-
-
-// import {db} from "../config";
-// import { set, ref } from 'firebase/database';
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
@@ -38,7 +38,7 @@ function ChefAlgo() {
     const [app_starting, set_app_starting] = useState(false)
 
     // const [stage, setStage] = useState(null);
-    const [stage, setStage] = useState("PRE-PREP");
+    const [stage, setStage] = useState(null);
     const [on_screen_instruction, set_on_screen_instruction] = useState(null)
     const [last_instruction_in_stage, set_last_instruction_in_stage] = useState(false)
     const [instruction_stage, set_instruction_stage] = useState(0)
@@ -112,7 +112,7 @@ function ChefAlgo() {
                             }
 
 
-    const pre_prep = ["Instruction1", "Instruction2", "Instruction3", "Instrucntion4"]
+    const pre_heat = ["1. Set all stoves to low-medium heat", "2. Set oven to low-medium heat"]
 
 
     useEffect(()=>{
@@ -373,16 +373,16 @@ function ChefAlgo() {
                         })
                     })
                 }).then(()=>{
-                    db.collection("recipes_test").doc("1").get().then((snapshot)=>{
+                    db.collection("recipes").doc("1").get().then((snapshot)=>{
                         recipe1 = snapshot.data()
                     }).then(()=>{
-                        db.collection("recipes_test").doc("2").get().then((snapshot)=>{
+                        db.collection("recipes").doc("2").get().then((snapshot)=>{
                             recipe2 = snapshot.data()
                         }).then(()=>{
-                            db.collection("recipes_test").doc("3").get().then((snapshot)=>{
+                            db.collection("recipes").doc("3").get().then((snapshot)=>{
                                 recipe3 = snapshot.data()
                             }).then(()=>{
-                                db.collection("recipes_test").doc("4").get().then((snapshot)=>{
+                                db.collection("recipes").doc("4").get().then((snapshot)=>{
                                     recipe4 = snapshot.data()
                                 }).then(()=>{
                                     if(recipe1 && recipe2 && recipe3 && recipe4){
@@ -527,7 +527,7 @@ function ChefAlgo() {
         set_on_screen_instruction(null)
         
         let i = 1;
-        for(i; i < Object.keys(recipes).length; i++){
+        for(i; i <= Object.keys(recipes).length; i++){
             let j = 0 ;
             let holderArray = []
             for(j; j < recipes[i]["stove-steps"].length; j++){
@@ -566,7 +566,7 @@ function ChefAlgo() {
                 })
             }
         }
-        if(i === Object.keys(recipes).length){
+        if(i === Object.keys(recipes).length + 1){
             set_background_update(background_update + 1)
             // set_current_instruction_object(null)
             setStage("STOVE-SECONDARY")
@@ -687,6 +687,12 @@ function ChefAlgo() {
         console.log("running stage complete")
 
         if(stage === "LOAD"){
+            setStage('BASE')
+            set_last_instruction_in_stage(false)
+            set_instruction_stage(1)
+            set_recipe_cycle_number(1)
+        }
+        else if(stage === 'BASE'){
             setStage('RETRIEVAL')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -705,12 +711,6 @@ function ChefAlgo() {
             set_recipe_cycle_number(1)
         }
         else if(stage === 'OVEN'){
-            setStage('BASE')
-            set_last_instruction_in_stage(false)
-            set_instruction_stage(1)
-            set_recipe_cycle_number(1)
-        }
-        else if(stage === 'BASE'){
             setStage('STOVE-PRELIM')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -755,7 +755,7 @@ function ChefAlgo() {
                 }
                 else if (stage === 'RETRIEVAL'){
                     console.log("program chosen: ingredientRetrieval")
-                    set_app_starting(false)
+                    
                     ingredientRetrieval()
                 }
                 else if(stage === 'PREP'){
@@ -769,6 +769,7 @@ function ChefAlgo() {
                 }
                 else if(stage === 'BASE'){
                     console.log("program chosen: base")
+                    set_app_starting(false)
                     base()
                 }
                 else if(stage === 'STOVE-PRELIM'){
@@ -788,34 +789,51 @@ function ChefAlgo() {
 
 
     //=====================================================
-    //  IF PRE-PREP STAGE THEN SHOW PRE-PREP INSTRUCTIONS
+    //  IF PRE-HEAT STAGE THEN SHOW PRE-HEAT INSTRUCTIONS
     //=====================================================
-    if(stage === "PRE-PREP"){
+    if(stage === "PRE-HEAT"){
         return(
+            
             <Container>
-                <Row>
-                    <Col>
-                        {pre_prep.map((item, index)=>{
-                            return(
-                                <Row>
-                                    <h3> {item} </h3>
-                                </Row>
-                            )
-                        })}
-                    </Col>
+                <div style={{"padding": "15px"}} >
+                    <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
+                    <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
+                        <Col>
+                            <h1> Pre-Heating </h1>
+                        </Col>
+                    </Row>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <Row>
+                        <Col>
+                            {pre_heat.map((item, index)=>{
+                                return(
+                                    <div>
+                                        <Card>
+                                           <h3> {item} </h3> 
+                                        </Card>
+                                        <br/>
+                                        
+                                    </div>
+                                )
+                            })}
+                        </Col>
 
-                    <Col>
-                        <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                            setStage("LOAD")
-                            set_app_starting(true)
-                            set_instruction_stage(instruction_stage + 1)
-                            set_recipe_cycle_number(recipe_cycle_number + 1)
-                            // program()
-                            
-                            setNextClick(true)
-                            }}>Next</Button>
-                    </Col>
-                </Row>
+                        <Col>
+                            <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                                setStage("LOAD")
+                                set_app_starting(true)
+                                set_instruction_stage(instruction_stage + 1)
+                                set_recipe_cycle_number(recipe_cycle_number + 1)
+                                // program()
+                                
+                                setNextClick(true)
+                                }}>Next</Button>
+                        </Col>
+                    </Row>
+                </div>
                 
             </Container>
             
@@ -833,7 +851,7 @@ function ChefAlgo() {
             
             <Container>
                 <h1 style={{"color": "#FF9F33"}}>Actual</h1>
-                <audio ref={audioPlayer} src={NotificationSound} />
+                <audio ref={audioPlayer} src={NewNotification} />
                 <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white", "margin-bottom": "10px"}}>
                     <Col>
                         <h2>Stage: {stage}</h2> 
@@ -940,7 +958,7 @@ function ChefAlgo() {
                                     {recipe_1_upcoming.length > 0 ? <h2>{recipe_1_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_1_timer} secs...</h5> : null} */}
                                     {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/60)) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_1_timer / 60) : '00'}:{ 59 >= (recipe_1_timer) ? (recipe_1_timer) : '00'}</h5> : null} */}
-                                    {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/60)) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_1_timer / 60) : '00'}:{ 59 >= (recipe_1_timer) ? (recipe_1_timer) : '00'}</h5> : null}
+                                    {(recipe_1_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/(60*60))) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (Math.floor(recipe_1_timer / 60)) : '00'}:{ (59 >= (recipe_1_timer%60)) ? (recipe_1_timer%60) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
                                 </Col >
@@ -950,7 +968,7 @@ function ChefAlgo() {
                                         {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                         {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
                                         {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null} */}
-                                        {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null}
+                                        {(recipe_2_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/(60*60))) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (Math.floor(recipe_2_timer / 60)) : '00'}:{ (59 >= (recipe_2_timer%60)) ? (recipe_2_timer%60) : '00'}</h5> : null}
 
                                     </div>
 
@@ -968,7 +986,7 @@ function ChefAlgo() {
                                     {recipe_3_upcoming.length > 0 ? <h2>{recipe_3_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_3_timer} secs...</h5> : null}                                     */}
                                     {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/60)) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (recipe_3_timer / 60) : '00'}:{ 59 >= (recipe_3_timer) ? (recipe_3_timer) : '00'}</h5> : null} */}
-                                    {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/60)) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (recipe_3_timer / 60) : '00'}:{ 59 >= (recipe_3_timer) ? (recipe_3_timer) : '00'}</h5> : null}
+                                    {(recipe_3_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/(60*60))) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (Math.floor(recipe_3_timer / 60)) : '00'}:{ (59 >= (recipe_3_timer%60)) ? (recipe_3_timer%60) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
                                 </Col>
@@ -977,7 +995,7 @@ function ChefAlgo() {
                                     {recipe_4_upcoming.length > 0 ? <h2>{recipe_4_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
                                     {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_4_timer} secs...</h5> : null} */}
                                     {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/60)) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (recipe_4_timer / 60) : '00'}:{ 59 >= (recipe_4_timer) ? (recipe_4_timer) : '00'}</h5> : null} */}
-                                    {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/60)) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (recipe_4_timer / 60) : '00'}:{ 59 >= (recipe_4_timer) ? (recipe_4_timer) : '00'}</h5> : null}
+                                    {(recipe_4_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/(60*60))) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (Math.floor(recipe_4_timer / 60)) : '00'}:{ (59 >= (recipe_4_timer%60)) ? (recipe_4_timer%60) : '00'}</h5> : null}
 
                                     <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
                                 </Col>
@@ -996,14 +1014,18 @@ function ChefAlgo() {
                                 <div>
                                     {completed_steps[consecutive_back_presses]["stage"] === "STOVE-SECONDARY" ? 
                                     <div>
+                                        <h3 style={{"color": "red", "opacity": "50%"}}>Previous Instruction:</h3>
                                         <h4>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h4>
                                         <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
-                                        <h4>Instruction: {completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
+                                        <h4 style={{"color": "red", "opacity": "50%"}}>{completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
                                     </div>
                                     :
                                     <div>
+                                        <h3 style={{"color": "red", "opacity": "50%"}}>Previous Instruction:</h3>
                                         <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
-                                        <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>   
+                                        <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
+                                        <h4 style={{"color": "red", "opacity": "50%"}}>{completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
+
                                     </div>
                                     
                                     }                                
@@ -1019,12 +1041,16 @@ function ChefAlgo() {
                                     <div>
                                         {/* {console.log("current instruction object: ", current_instruction_object)} */}
                                         <h2>Stove: {to_do_steps["steps"][0]["recipe-number"]}</h2>
+                                        <h4 style={{"color": "green", "opacity": "50%"}}>Current Instruction:</h4>
                                         <h3>Meal: {to_do_steps["steps"][0]["recipe-name"]}</h3>
-                                        <h4>Instruction: {to_do_steps["steps"][0]["step-info"]["instruction"]}</h4>
                                         
                                         <br/>
+                                        <h4 style={{"color": "green", "opacity": "50%"}}>{to_do_steps["steps"][0]["step-info"]["instruction"]}</h4>
+
+                                        
+                                        {/* <br/>
                                         <br/>
-                                        <br/>
+                                        <br/> */}
 
                                         {/* {completed_steps.length > 0 && 
                                         <div>
@@ -1121,7 +1147,7 @@ function ChefAlgo() {
     else if(stage === null){
         return(
             <div style={{"padding": "15px"}} >
-                <h1 style={{"color": "#FF9F33"}}>Demo</h1>                
+                <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
                 <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
                     <Col>
                         <h1>Press Start button to begin</h1>
@@ -1134,7 +1160,7 @@ function ChefAlgo() {
                 <Row>
                     <Col>
                         { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                            setStage('LOAD')
+                            setStage('PRE-HEAT')
                             set_app_starting(true)
                             set_instruction_stage(instruction_stage + 1)
                             set_recipe_cycle_number(recipe_cycle_number + 1)
@@ -1151,7 +1177,7 @@ function ChefAlgo() {
     }
 
     //=====================================================
-    //   IF BASE/OVEN/PREP STAGE SHOW 4 BOWLS 
+    //   IF BASE/RETRIEVAL/OVEN/PREP STAGE SHOW 4 BOWLS 
     //   AND INSTRUCTIONS FOR EACH BOWL/RECIPE
     //=====================================================
     else{
@@ -1245,7 +1271,7 @@ function ChefAlgo() {
                                     
                                 </div>}
 
-                                <img style={{"width": window.innerWidth * 0.2}} src={mixing_bowl} alt="mixing bowl" />
+                                <img style={{"width": window.innerWidth * 0.2}} src={chopping_board3} alt="mixing bowl" />
 
                             </Col>
 
@@ -1260,7 +1286,7 @@ function ChefAlgo() {
                                     }
 
                                 </div>}
-                                <img style={{"width": window.innerWidth * 0.2}} src={mixing_bowl} alt="mixing bowl" />
+                                <img style={{"width": window.innerWidth * 0.2}} src={chopping_board3} alt="mixing bowl" />
                             </Col>
 
                             <Col style={{"height": "100%", "backgroundColor": recipe_stage_colors[recipe_cycle_number][3], "color": "white"}}>
@@ -1275,7 +1301,7 @@ function ChefAlgo() {
                                     
 
                                 </div>}
-                                <img style={{"width": window.innerWidth * 0.2}} src={mixing_bowl} alt="mixing bowl" />
+                                <img style={{"width": window.innerWidth * 0.2}} src={chopping_board3} alt="mixing bowl" />
                             </Col>
 
                             <Col style={{"height": "100%", "backgroundColor": recipe_stage_colors[recipe_cycle_number][4], "color": "white"}}>
@@ -1289,7 +1315,7 @@ function ChefAlgo() {
                                     }
 
                                 </div>}
-                                <img style={{"width": window.innerWidth * 0.2}} src={mixing_bowl} alt="mixing bowl" />
+                                <img style={{"width": window.innerWidth * 0.2}} src={chopping_board3} alt="mixing bowl" />
                             </Col>
 
                         </Row>

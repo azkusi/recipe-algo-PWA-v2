@@ -546,7 +546,7 @@ function Demo() {
         // let recipes = {1: recipe1, 2: recipe2, 3: recipe3, 4: recipe4}
         
         let i = 1;
-        for(i; i < Object.keys(recipes).length; i++){
+        for(i; i <= Object.keys(recipes).length; i++){
             let j = 0 ;
             let holderArray = []
             for(j; j < recipes[i]["stove-steps"].length; j++){
@@ -555,6 +555,7 @@ function Demo() {
             if(i === 1){
                 //send to firebase
                 set_recipe_1_upcoming(holderArray)
+                console.log("recipe 1 write")
                 db.collection("upcoming-recipes").doc(recipe_1_upcoming_FBID).set({
                     "to_do_steps_instance_FBID": to_do_steps_instance_FBID,
                     "info": holderArray
@@ -563,6 +564,7 @@ function Demo() {
             else if(i === 2){
                 //send to firebase
                 set_recipe_2_upcoming(holderArray)
+                console.log("recipe 2 write")
                 db.collection("upcoming-recipes").doc(recipe_2_upcoming_FBID).set({
                     "to_do_steps_instance_FBID": to_do_steps_instance_FBID,
                     "info": holderArray
@@ -571,6 +573,7 @@ function Demo() {
             else if(i === 3){
                 //send to firebase
                 set_recipe_3_upcoming(holderArray)
+                console.log("recipe 3 write")
                 db.collection("upcoming-recipes").doc(recipe_3_upcoming_FBID).set({
                     "to_do_steps_instance_FBID": to_do_steps_instance_FBID,
                     "info": holderArray
@@ -579,13 +582,14 @@ function Demo() {
             else if(i === 4){
                 //send to firebase
                 set_recipe_4_upcoming(holderArray)
+                console.log("recipe 4 write")
                 db.collection("upcoming-recipes").doc(recipe_4_upcoming_FBID).set({
                     "to_do_steps_instance_FBID": to_do_steps_instance_FBID,
                     "info": holderArray
                 })
             }
         }
-        if(i === Object.keys(recipes).length){
+        if(i === Object.keys(recipes).length + 1){
             set_background_update(background_update + 1)
             // set_current_instruction_object(null)
             setStage("STOVE-SECONDARY")
@@ -636,6 +640,7 @@ function Demo() {
                             
                             }
                             if(j === recipeSteps.length){
+                                console.log(`recipe ${upcoming_recipe_FBID} deletion of step: ${step}`)
                                 db.collection("upcoming-recipes").doc(upcoming_recipe_FBID).update({
                                     "info": recipeSteps
                                 }).then(()=>{
@@ -704,6 +709,12 @@ function Demo() {
         console.log("running stage complete")
 
         if(stage === "LOAD"){
+            setStage('BASE')
+            set_last_instruction_in_stage(false)
+            set_instruction_stage(1)
+            set_recipe_cycle_number(1)
+        }
+        else if(stage === 'BASE'){
             setStage('RETRIEVAL')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -722,12 +733,6 @@ function Demo() {
             set_recipe_cycle_number(1)
         }
         else if(stage === 'OVEN'){
-            setStage('BASE')
-            set_last_instruction_in_stage(false)
-            set_instruction_stage(1)
-            set_recipe_cycle_number(1)
-        }
-        else if(stage === 'BASE'){
             setStage('STOVE-PRELIM')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -772,7 +777,7 @@ function Demo() {
                 }
                 else if (stage === 'RETRIEVAL'){
                     console.log("program chosen: ingredientRetrieval")
-                    set_app_starting(false)
+                    
                     ingredientRetrieval()
                 }
                 else if(stage === 'PREP'){
@@ -786,6 +791,7 @@ function Demo() {
                 }
                 else if(stage === 'BASE'){
                     console.log("program chosen: base")
+                    set_app_starting(false)
                     base()
                 }
                 else if(stage === 'STOVE-PRELIM'){
@@ -1277,26 +1283,27 @@ function Demo() {
                     </Container>
                 </Row>
 
-                {/* <Row>
-                    <h3>Previous Instruction:</h3>
-                    {(consecutive_back_presses >= 0 && completed_steps.length > 0) ?    
+                <Row>
+                    
+                    {(consecutive_back_presses >= 0 && completed_steps.length > 0) &&    
                         <div>
+                            <h3>Previous Instruction:</h3>
                             <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
                             <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>
                         </div>
                          
-                        :
+                        // :
 
-                        (completed_steps.length > 0 && 
+                        // (completed_steps.length > 0 && 
 
-                            <div>                            
-                                <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
-                                <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
-                            </div>
-                        )
+                        //     <div>                            
+                        //         <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
+                        //         <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
+                        //     </div>
+                        // )
                         
                     }
-                </Row> */}
+                </Row>
     
             </div>
                 
