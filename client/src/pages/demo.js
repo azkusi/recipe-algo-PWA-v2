@@ -28,6 +28,7 @@ import 'firebase/compat/firestore';
 import { React, useEffect, useState, useRef } from 'react';
 import { db } from '../config';
 import useBackgroundFunc from '../hooks/useBackgroundFunc';
+// import useQueueNextStep from '../hooks/useQueueNextStep';
 // import Timer from './timer';
 
 
@@ -89,7 +90,8 @@ function Demo() {
     const background_colour_3 = useBackgroundFunc().background_colour_3
     const background_colour_4 = useBackgroundFunc().background_colour_4
     
-    
+    const [upcoming_recipes_array, set_upcoming_recipes_array] = useState([])
+
 
     const [current_instruction_object, set_current_instruction_object] = useState(null)
 
@@ -97,6 +99,8 @@ function Demo() {
     const current_recipe_name_stove_sec = useBackgroundFunc().current_recipe_name
 
     const to_do_steps = useBackgroundFunc().toDos
+
+    // const stepQueuer = useQueueNextStep(upcoming_recipes_array)
     
     const [to_do_steps_length, set_to_do_steps_length] = useState(0)
     const [to_do_steps_prior_length, set_to_do_steps_prior_length] = useState(0)
@@ -400,6 +404,7 @@ function Demo() {
                                 }).then(()=>{
                                     if(recipe1 && recipe2 && recipe3 && recipe4){
                                         set_recipes({1: recipe1, 2: recipe2, 3: recipe3, 4: recipe4})
+                                        set_upcoming_recipes_array([upcoming_recipe_1_FBID, upcoming_recipe_2_FBID, upcoming_recipe_3_FBID, upcoming_recipe_4_FBID])
                                         set_last_instruction_in_stage(true)
                                         resolve()
 
@@ -602,6 +607,7 @@ function Demo() {
     function stoveSecondary(){
 
         console.log("running stove func ")
+        QueueNextStep()
         
     }
 
@@ -702,6 +708,137 @@ function Demo() {
         console.log("timer created for recipe", upcoming_recipe_FBID, "of" , (duration*60).toString(), ' seconds')
        
     }
+
+
+
+    function QueueNextStep(document_array){
+        console.log("queue next step ran again...")
+
+        let queue = setInterval(()=>{
+            
+            let x = 1;
+            //console.log("recipes length is: ", recipes.length)
+            for(x; x <= 4; x++){
+                // console.log(x.toString())
+                if(x === 1){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }else if(x === 2){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }else if(x === 3){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    })
+                            
+                            
+                }else if(x === 4){
+        
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }                
+            }
+            
+        }, 5000)
+    }
+
 
 
     //=====================================================

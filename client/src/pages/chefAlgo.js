@@ -28,6 +28,7 @@ import 'firebase/compat/firestore';
 import { React, useEffect, useState, useRef } from 'react';
 import { db } from '../config';
 import useBackgroundFunc from '../hooks/useBackgroundFunc';
+// import useQueueNextStep from '../hooks/useQueueNextStep';
 
 
 function ChefAlgo() {
@@ -79,7 +80,7 @@ function ChefAlgo() {
     const background_colour_3 = useBackgroundFunc().background_colour_3
     const background_colour_4 = useBackgroundFunc().background_colour_4
     
-    
+    const [upcoming_recipes_array, set_upcoming_recipes_array] = useState([])
 
     const [current_instruction_object, set_current_instruction_object] = useState(null)
 
@@ -87,6 +88,7 @@ function ChefAlgo() {
     const current_recipe_name_stove_sec = useBackgroundFunc().current_recipe_name
 
     const to_do_steps = useBackgroundFunc().toDos
+    // const stepQueuer = useQueueNextStep(upcoming_recipes_array)
     
     const [to_do_steps_length, set_to_do_steps_length] = useState(0)
     const [to_do_steps_prior_length, set_to_do_steps_prior_length] = useState(0)
@@ -328,7 +330,7 @@ function ChefAlgo() {
 
                 db.collection("to-do-steps").add({"steps": []})
                 .then((docRef) => {
-                    console.log("Document written with ID: ", docRef.id);
+                    console.log("To do steps Document written with ID: ", docRef.id);
 
                     to_do_steps_instance_FBID = docRef.id
                     set_to_do_steps_instance_FBID(docRef.id)
@@ -336,28 +338,28 @@ function ChefAlgo() {
                 .then(()=>{
                     db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
                     .then((docRef) => {
-                        console.log("Document written with ID: ", docRef.id);
+                        console.log("Upcoming recipes1 Document written with ID: ", docRef.id);
 
                         upcoming_recipe_1_FBID = docRef.id
                         set_recipe_1_upcoming_FBID(docRef.id)
                     }).then(()=>{
                         db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
                         .then((docRef) => {
-                            console.log("Document written with ID: ", docRef.id);
+                            console.log("Upcoming recipes2 Document written with ID: ", docRef.id);
 
                             upcoming_recipe_2_FBID = docRef.id
                             set_recipe_2_upcoming_FBID(docRef.id)
                         }).then(()=>{
                             db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
                             .then((docRef) => {
-                                console.log("Document written with ID: ", docRef.id);
+                                console.log("Upcoming recipes3 Document written with ID: ", docRef.id);
 
                                 upcoming_recipe_3_FBID = docRef.id
                                 set_recipe_3_upcoming_FBID(docRef.id)
                             }).then(()=>{
                                 db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
                                 .then((docRef) => {
-                                    console.log("Document written with ID: ", docRef.id);
+                                    console.log("Upcoming recipes4 Document written with ID: ", docRef.id);
 
                                     upcoming_recipe_4_FBID = docRef.id
                                     set_recipe_4_upcoming_FBID(docRef.id)
@@ -387,6 +389,7 @@ function ChefAlgo() {
                                 }).then(()=>{
                                     if(recipe1 && recipe2 && recipe3 && recipe4){
                                         set_recipes({1: recipe1, 2: recipe2, 3: recipe3, 4: recipe4})
+                                        set_upcoming_recipes_array([recipe_1_upcoming_FBID, recipe_2_upcoming_FBID, recipe_3_upcoming_FBID, recipe_4_upcoming_FBID])
                                         set_last_instruction_in_stage(true)
                                         resolve()
 
@@ -411,7 +414,7 @@ function ChefAlgo() {
 
     function ingredientRetrieval(){
 
-
+        console.log(recipe_4_upcoming_FBID)
         console.log("starting ingredient retrieval")
         console.log("recipe cycle number: ", recipe_cycle_number.toString())
 
@@ -576,7 +579,7 @@ function ChefAlgo() {
 
     function stoveSecondary(){
 
-        console.log("running stove func ")
+        QueueNextStep(upcoming_recipes_array)
         
     }
 
@@ -680,6 +683,144 @@ function ChefAlgo() {
     }
 
 
+
+    //================================================================================
+    //any steps that have 0 dependency (i.e. not waiting for other steps to complete
+    //remove them from the upcoming recipe steps array and place in to_do steps array
+    //================================================================================
+    function QueueNextStep(document_array){
+        console.log("queue next step ran again...")
+
+        let queue = setInterval(()=>{
+            
+            let x = 1;
+            //console.log("recipes length is: ", recipes.length)
+            for(x; x <= 4; x++){
+                // console.log(x.toString())
+                if(x === 1){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }else if(x === 2){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }else if(x === 3){
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    })
+                            
+                            
+                }else if(x === 4){
+        
+                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"]).get()
+                    .then((snapshot)=>{
+                        if("info" in snapshot.data()){
+                            if(snapshot.data()["info"].length === 0){
+                                clearInterval(queue)
+                            }else{
+                                
+                                let i = 0;
+                                let recipeStepsArray = snapshot.data()["info"]
+                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+                                for(i; i < recipeStepsArray.length; i++){
+                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+                                        let toDoAddition = recipeStepsArray[i]
+                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
+                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+                                        .then(()=>{
+                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"])
+                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
+                    })
+                }                
+            }
+            
+        }, 5000)
+    }
+    
+    
+        
+
+
+
     //=====================================================
     //   EACH TIME STAGE IS COMPLETE, MOVE TO NEXT STAGE
     //=====================================================
@@ -721,6 +862,7 @@ function ChefAlgo() {
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
+
         }
         else if(stage === 'STOVE-SECONDARY'){
             setStage('PACKAGE')
@@ -858,7 +1000,7 @@ function ChefAlgo() {
                     </Col>
 
                     <Col>
-                    { (to_do_steps) && 
+                    { (to_do_steps !== undefined) && 
                         (
                             (to_do_steps["steps"].length > 0) && 
                             <div>
