@@ -31,33 +31,33 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
             if(toDoStepsFBInstance){
                 const unsub =  db.collection("to-do-steps").doc(toDoStepsFBInstance)
                 // .orderBy('timestamp', 'desc')
-                .onSnapshot(async (snapshot)=>{
+                .onSnapshot(async (doc)=>{
                     let to_do_steps = [];
                     return new Promise ((resolve, reject)=>{
                         //let docID = snapshot.id
-                        setToDos(snapshot.data())
-                        if("steps" in snapshot.data()){
-                            if(snapshot.data()["steps"].length > 0){
+                        setToDos(doc.data())
+                        if("steps" in doc.data()){
+                            if(doc.data()["steps"].length > 0){
 
-                                if(snapshot.data()["steps"][0]["recipe-number"] === 1){
+                                if(doc.data()["steps"][0]["recipe-number"] === 1){
                                     set_background_colour_1("#ff5440")
                                     set_background_colour_2("transparent")
                                     set_background_colour_3("transparent")
                                     set_background_colour_4("transparent")
                                 }
-                                if(snapshot.data()["steps"][0]["recipe-number"] === 2){
+                                if(doc.data()["steps"][0]["recipe-number"] === 2){
                                     set_background_colour_2("#ff5440")
                                     set_background_colour_1("transparent")
                                     set_background_colour_3("transparent")
                                     set_background_colour_4("transparent")
                                 }
-                                if(snapshot.data()["steps"][0]["recipe-number"] === 3){
+                                if(doc.data()["steps"][0]["recipe-number"] === 3){
                                     set_background_colour_3("#ff5440")
                                     set_background_colour_1("transparent")
                                     set_background_colour_2("transparent")
                                     set_background_colour_4("transparent")
                                 }
-                                if(snapshot.data()["steps"][0]["recipe-number"] === 4){
+                                if(doc.data()["steps"][0]["recipe-number"] === 4){
                                     set_background_colour_4("#ff5440")
                                     set_background_colour_1("transparent")
                                     set_background_colour_2("transparent")
