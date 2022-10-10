@@ -85,20 +85,20 @@ function Demo() {
 
     const [background_update, set_background_update] = useState(0)
 
-    const background_colour_1 = useBackgroundFunc().background_colour_1
-    const background_colour_2 = useBackgroundFunc().background_colour_2
-    const background_colour_3 = useBackgroundFunc().background_colour_3
-    const background_colour_4 = useBackgroundFunc().background_colour_4
+    const background_colour_1 = useBackgroundFunc(to_do_steps_instance_FBID).background_colour_1
+    const background_colour_2 = useBackgroundFunc(to_do_steps_instance_FBID).background_colour_2
+    const background_colour_3 = useBackgroundFunc(to_do_steps_instance_FBID).background_colour_3
+    const background_colour_4 = useBackgroundFunc(to_do_steps_instance_FBID).background_colour_4
     
     const [upcoming_recipes_array, set_upcoming_recipes_array] = useState([])
 
 
     const [current_instruction_object, set_current_instruction_object] = useState(null)
 
-    const on_screen_instruction_stove_sec = useBackgroundFunc().on_screen_instruction
-    const current_recipe_name_stove_sec = useBackgroundFunc().current_recipe_name
+    // const on_screen_instruction_stove_sec = useBackgroundFunc().on_screen_instruction
+    // const current_recipe_name_stove_sec = useBackgroundFunc().current_recipe_name
 
-    const to_do_steps = useBackgroundFunc().toDos
+    const to_do_steps = useBackgroundFunc(to_do_steps_instance_FBID).toDos
 
     // const stepQueuer = useQueueNextStep(upcoming_recipes_array)
     
@@ -1283,7 +1283,7 @@ function Demo() {
         return (
             app_starting ? 
             <div style={{"display": "flex",
-                "align-items": "center", "justify-content": "center"}}>
+                "alignItems": "center", "justify-content": "center"}}>
                <div>
                     <h1 style={{"color": "#FF9F33"}}>Demo</h1>
                     <Spinner animation="border"/>

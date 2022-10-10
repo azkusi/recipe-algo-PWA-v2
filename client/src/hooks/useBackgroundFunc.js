@@ -16,7 +16,7 @@ import {useEffect, useState } from 'react';
 // ANY TIME THERE IS A CHANGE/ADDITION/REMOVAL FROM THE TO-DO-STEPS COLLECTION
 // SEND THAT DATA (I.E THE NEW REMAINING TO DO STEPS) TO THE ALGO
 //==============================================================================
-const useBackgroundFunc = () => {
+const useBackgroundFunc = (toDoStepsFBInstance) => {
         const [toDos, setToDos] = useState(null)
         console.log("useBackgroundFunc render ran again...")
 
@@ -28,73 +28,69 @@ const useBackgroundFunc = () => {
     
     
         useEffect(()=>{
-            const unsub =  db.collection("to-do-steps")
-            // .orderBy('timestamp', 'desc')
-            .onSnapshot(async (snapshot)=>{
-                let to_do_steps = [];
-                return new Promise ((resolve, reject)=>{
+            if(toDoStepsFBInstance){
+                const unsub =  db.collection("to-do-steps").doc(toDoStepsFBInstance)
+                // .orderBy('timestamp', 'desc')
+                .onSnapshot(async (snapshot)=>{
+                    let to_do_steps = [];
+                    return new Promise ((resolve, reject)=>{
                         //let docID = snapshot.id
-                        snapshot.docChanges().forEach((change) => {
-                            // setToDos(snapshot.data())
-                            setToDos(change.doc.data())
-                            if("steps" in change.doc.data()){
-                                if(change.doc.data()["steps"].length > 0){
-                                
-                                    if(change.doc.data()["steps"][0]["recipe-number"] === 1){
-                                        set_background_colour_1("#ff5440")
-                                        set_background_colour_2("transparent")
-                                        set_background_colour_3("transparent")
-                                        set_background_colour_4("transparent")
-                                    }
-                                    if(change.doc.data()["steps"][0]["recipe-number"] === 2){
-                                        set_background_colour_2("#ff5440")
-                                        set_background_colour_1("transparent")
-                                        set_background_colour_3("transparent")
-                                        set_background_colour_4("transparent")
-                                    }
-                                    if(change.doc.data()["steps"][0]["recipe-number"] === 3){
-                                        set_background_colour_3("#ff5440")
-                                        set_background_colour_1("transparent")
-                                        set_background_colour_2("transparent")
-                                        set_background_colour_4("transparent")
-                                    }
-                                    if(change.doc.data()["steps"][0]["recipe-number"] === 4){
-                                        set_background_colour_4("#ff5440")
-                                        set_background_colour_1("transparent")
-                                        set_background_colour_2("transparent")
-                                        set_background_colour_3("transparent")
-                                    }
-                                }
-                                else{
+                        setToDos(snapshot.data())
+                        if("steps" in snapshot.data()){
+                            if(snapshot.data()["steps"].length > 0){
+
+                                if(snapshot.data()["steps"][0]["recipe-number"] === 1){
+                                    set_background_colour_1("#ff5440")
+                                    set_background_colour_2("transparent")
+                                    set_background_colour_3("transparent")
                                     set_background_colour_4("transparent")
+                                }
+                                if(snapshot.data()["steps"][0]["recipe-number"] === 2){
+                                    set_background_colour_2("#ff5440")
+                                    set_background_colour_1("transparent")
+                                    set_background_colour_3("transparent")
+                                    set_background_colour_4("transparent")
+                                }
+                                if(snapshot.data()["steps"][0]["recipe-number"] === 3){
+                                    set_background_colour_3("#ff5440")
+                                    set_background_colour_1("transparent")
+                                    set_background_colour_2("transparent")
+                                    set_background_colour_4("transparent")
+                                }
+                                if(snapshot.data()["steps"][0]["recipe-number"] === 4){
+                                    set_background_colour_4("#ff5440")
                                     set_background_colour_1("transparent")
                                     set_background_colour_2("transparent")
                                     set_background_colour_3("transparent")
                                 }
                             }
-                            
+                            else{
+                                set_background_colour_4("transparent")
+                                set_background_colour_1("transparent")
+                                set_background_colour_2("transparent")
+                                set_background_colour_3("transparent")
+                            }
+                        }
+                                
 
-                        //db.collection("upcoming_recipes").doc(ID).update({
-                        //     "info": FieldValue.arrayRemove(recipe)
-                        // }); 
-                        })                       
-                    
-                    resolve({
+                        resolve({
                             "to_do_steps": to_do_steps, 
                             "background_colour_1": background_colour_1, 
                             "background_colour_2": background_colour_2, 
                             "background_colour_3": background_colour_3, 
                             "background_colour_4": background_colour_4, 
-                    });
-                }).then((result)=>{
-                // setToDos(result["to_do_steps"])
+                        });
+                    }).then((result)=>{
+                    // setToDos(result["to_do_steps"])
+                    })
+                }, (error)=>{
+                    console.log("document id passed, likely not defined")
+                    console.log("error", error)
                 })
-            }, (error)=>{
-                console.log("document id passed, likely not defined")
-                console.log("error", error)
-            })
-                    
-            return () => unsub();
+                        
+                return () => unsub();
+            }
+            
             
         }, [])
     
