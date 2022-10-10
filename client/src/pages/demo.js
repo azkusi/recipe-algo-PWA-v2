@@ -136,7 +136,7 @@ function Demo() {
     //=====================================================
     
     useEffect(()=>{
-        if(to_do_steps){
+        if(to_do_steps && ("steps" in to_do_steps)){
            if(to_do_steps["steps"].length === 0){
                 set_to_do_steps_prior_length(0)
                 set_to_do_steps_length(0)

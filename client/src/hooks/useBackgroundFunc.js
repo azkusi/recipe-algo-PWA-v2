@@ -37,40 +37,42 @@ const useBackgroundFunc = () => {
                         snapshot.docChanges().forEach((change) => {
                             // setToDos(snapshot.data())
                             setToDos(change.doc.data())
-
-                            if(change.doc.data()["steps"].length > 0){
+                            if("steps" in change.doc.data()){
+                                if(change.doc.data()["steps"].length > 0){
                                 
-                                if(change.doc.data()["steps"][0]["recipe-number"] === 1){
-                                    set_background_colour_1("#ff5440")
-                                    set_background_colour_2("transparent")
-                                    set_background_colour_3("transparent")
-                                    set_background_colour_4("transparent")
+                                    if(change.doc.data()["steps"][0]["recipe-number"] === 1){
+                                        set_background_colour_1("#ff5440")
+                                        set_background_colour_2("transparent")
+                                        set_background_colour_3("transparent")
+                                        set_background_colour_4("transparent")
+                                    }
+                                    if(change.doc.data()["steps"][0]["recipe-number"] === 2){
+                                        set_background_colour_2("#ff5440")
+                                        set_background_colour_1("transparent")
+                                        set_background_colour_3("transparent")
+                                        set_background_colour_4("transparent")
+                                    }
+                                    if(change.doc.data()["steps"][0]["recipe-number"] === 3){
+                                        set_background_colour_3("#ff5440")
+                                        set_background_colour_1("transparent")
+                                        set_background_colour_2("transparent")
+                                        set_background_colour_4("transparent")
+                                    }
+                                    if(change.doc.data()["steps"][0]["recipe-number"] === 4){
+                                        set_background_colour_4("#ff5440")
+                                        set_background_colour_1("transparent")
+                                        set_background_colour_2("transparent")
+                                        set_background_colour_3("transparent")
+                                    }
                                 }
-                                if(change.doc.data()["steps"][0]["recipe-number"] === 2){
-                                    set_background_colour_2("#ff5440")
-                                    set_background_colour_1("transparent")
-                                    set_background_colour_3("transparent")
+                                else{
                                     set_background_colour_4("transparent")
-                                }
-                                if(change.doc.data()["steps"][0]["recipe-number"] === 3){
-                                    set_background_colour_3("#ff5440")
-                                    set_background_colour_1("transparent")
-                                    set_background_colour_2("transparent")
-                                    set_background_colour_4("transparent")
-                                }
-                                if(change.doc.data()["steps"][0]["recipe-number"] === 4){
-                                    set_background_colour_4("#ff5440")
                                     set_background_colour_1("transparent")
                                     set_background_colour_2("transparent")
                                     set_background_colour_3("transparent")
                                 }
                             }
-                            else{
-                                set_background_colour_4("transparent")
-                                set_background_colour_1("transparent")
-                                set_background_colour_2("transparent")
-                                set_background_colour_3("transparent")
-                            }
+                            
 
                         //db.collection("upcoming_recipes").doc(ID).update({
                         //     "info": FieldValue.arrayRemove(recipe)
