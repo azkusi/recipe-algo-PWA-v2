@@ -19,6 +19,7 @@ import {useEffect, useState } from 'react';
 const useBackgroundFunc = (toDoStepsFBInstance) => {
         const [toDos, setToDos] = useState(null)
         console.log("useBackgroundFunc render ran again...")
+        console.log("instance is: ", toDoStepsFBInstance)
 
         const [background_colour_1, set_background_colour_1] = useState('transparent')
         const [background_colour_2, set_background_colour_2] = useState('transparent')
@@ -37,7 +38,7 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
                         let to_do_steps = [];
                         return new Promise ((resolve, reject)=>{
                             //let docID = snapshot.id
-                            setToDos(doc.data())
+                            // setToDos(doc.data())
                             if("steps" in doc.data()){
                                 if(doc.data()["steps"].length > 0){
 
@@ -83,7 +84,7 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
                                 "background_colour_4": background_colour_4, 
                             });
                         }).then((result)=>{
-                        // setToDos(result["to_do_steps"])
+                            setToDos(result["to_do_steps"])
                         })  
                     }
                     
