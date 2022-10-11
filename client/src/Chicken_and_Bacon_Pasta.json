@@ -3,7 +3,7 @@
     "name": "Chicken and Bacon Pasta", 
     "base-steps":[
         {"instruction":"Soak 150g of tagliatelle pasta in boiling water till softened, then drain water",
-        "step-number": 1,
+        "step-number": "B1",
         "duration": 0.5,
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []
@@ -11,57 +11,57 @@
     ],
     "retrieval-steps":[
         {"instruction": "Retrieve olive oil",
-        "step-number": 1,
+        "step-number": "R1",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve butter",
-        "step-number": 2,
+        "step-number": "R2",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 onion",
-        "step-number": 3,
+        "step-number": "R3",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 garlic",
-        "step-number": 4,
+        "step-number": "R4",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve double cream",
-        "step-number": 5,
+        "step-number": "R5",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve marscarpone",
-        "step-number": 6,
+        "step-number": "R6",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve parmesan",
-        "step-number": 7,
+        "step-number": "R7",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 chicken stock cube",
-        "step-number": 8,
+        "step-number": "R8",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 2 chicken breasts",
-        "step-number": 9,
+        "step-number": "R9",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
-        {"instruction": "Retrieve pack of streaky bacon",
-        "step-number": 10,
+        {"instruction": "Retrieve pack of diced bacon pieces (lardons)",
+        "step-number": "R10",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve parsley",
-        "step-number": 11,
+        "step-number": "R11",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         }
@@ -69,105 +69,113 @@
 
     "prep-steps":[
         {"instruction": "Finely grate 1 garlic clove",
-        "step-number": 1,
+        "step-number": "P1",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Finely chop 1 onion into small pieces",
-        "step-number": 2,
+        "step-number": "P2",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Slice 1 chicken breast into small pieces",
-        "step-number": 3,
+        "step-number": "P3",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Finely slice small handful of parsley",
-        "step-number": 4,
+        "step-number": "P4",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Transfer all chopped ingredients to one plate keeping each ingredient separate",
-        "step-number": 5,
+        "step-number": "P5",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Place the plate used for this recipe aside for now",
-        "step-number": 6,
+        "step-number": "P6",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         }
     ],
 
-    "oven-steps":[],
-
-    "stove-steps":[
-        {"instruction": "Place 6 bacon strips in oven for 18 mins on medium heat",
-        "step-number": 1,
+    "oven-steps":[
+        {"instruction": "Place bacon pieces in oven for 18 mins on medium heat",
+        "step-number": "O1",
         "imperative-claasification": "NON_IMPERATIVE",
         "duration": 18,
         "step-dependency": []            
         },
         {"instruction": "Place chicken breast pieces in the oven on medium heat for 20 mins",
-        "step-number": 2,
+        "step-number": "O2",
         "imperative-claasification": "NON_IMPERATIVE",
         "duration": 20,
         "step-dependency": []            
-        },
-        {"instruction": "Take the bacon strips out of the oven and cut into small pieces",
-        "step-number": 3,
-        "duration": 0,
+        }
+    ],
+
+    "stove-steps":[
+        
+        {"instruction": "Take the bacon pieces out of the oven",
+        "step-number": "S1",
+        "duration": 0.1,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1]            
+        "step-dependency": ["O1"]            
         },
         {"instruction": "Turn the oven off and take the chicken pieces out",
-        "step-number": 4,
-        "duration": 0,
+        "step-number": "S2",
+        "duration": 0.1,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2]            
+        "step-dependency": ["O2"]            
         },
         {"instruction": "Heat the olive oil and 1 table-spoon of butter in a saucepan on low heat for 2 mins",
-        "step-number": 5,
+        "step-number": "S3",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4]            
+        "step-dependency": []            
         },
         {"instruction": "Fry the onion pieces for 10 mins on low heat",
-        "step-number": 6,
+        "step-number": "S4",
         "duration": 10,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5]            
+        "step-dependency": ["S3"]            
         },
         {"instruction": "Add the garlic pieces and cook on low heat for 2 mins",
-        "step-number": 7,
+        "step-number": "S5",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6]            
+        "step-dependency": ["S4"]            
         },
         {"instruction": "Mix in 200ml double-cream, 100g mascarpone, 75g parmesan and 1 chicken stock cube and stir for 2 mins",
-        "step-number": 8,
+        "step-number": "S6",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7]
+        "step-dependency": ["S5"]
+        },
+        {"instruction": "Turn hob to lowest setting whilst waiting for chicken and bacon to finish",
+        "step-number": "S7",
+        "duration": 2,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": ["S6"]
         },
         {"instruction": "Add cooked chicken and bacon for 2 mins",
-        "step-number": 9,
+        "step-number": "S8",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8]
+        "step-dependency": ["S1", "S2", "S7"]
         },
         {"instruction": "Turn off the hob",
-        "step-number": 10,
-        "duration": 0,
+        "step-number": "S9",
+        "duration": 0.1,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        "step-dependency": ["S8"]
         },
         {"instruction": "Ready to serve",
-        "step-number": 11,
-        "duration": 0,
+        "step-number": "S10",
+        "duration": 0.1,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        "step-dependency": ["S9"]
         }
     ]
 }

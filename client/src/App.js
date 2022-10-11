@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Route, Routes, BrowserRouter} from 'react-router-dom';
+import {Route, Routes, BrowserRouter, Link} from 'react-router-dom';
 
 // import * as recipe1 from './recipe1.json';
 // import * as recipe2 from './recipe2.json';
@@ -21,6 +21,11 @@ function App() {
 
   return (
     <div className="App">
+      {/* <h3>
+        <Link to="/">
+          Home
+        </Link>
+      </h3> */}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing/>} />

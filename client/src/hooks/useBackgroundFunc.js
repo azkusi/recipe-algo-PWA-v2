@@ -38,8 +38,10 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
                         let to_do_steps = [];
                         return new Promise ((resolve, reject)=>{
                             //let docID = snapshot.id
-                            // setToDos(doc.data())
+                            setToDos(doc.data())
+                            console.log("got to usebckgrnd set")
                             if("steps" in doc.data()){
+                                to_do_steps = doc.data()
                                 if(doc.data()["steps"].length > 0){
 
                                     if(doc.data()["steps"][0]["recipe-number"] === 1){
@@ -75,7 +77,6 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
                                 }
                             }
                                     
-
                             resolve({
                                 "to_do_steps": to_do_steps, 
                                 "background_colour_1": background_colour_1, 
@@ -84,7 +85,8 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
                                 "background_colour_4": background_colour_4, 
                             });
                         }).then((result)=>{
-                            setToDos(result["to_do_steps"])
+                            console.log("todos at background func: ", result)
+                            // setToDos(result["to_do_steps"])
                         })  
                     }
                     
@@ -97,7 +99,7 @@ const useBackgroundFunc = (toDoStepsFBInstance) => {
             }
             
             
-        }, [])
+        }, [toDoStepsFBInstance])
     
     
     

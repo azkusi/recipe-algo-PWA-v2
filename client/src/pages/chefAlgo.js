@@ -1,4 +1,7 @@
 import Button from '@mui/material/Button';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 
 import mixing_bowl from '../images/mixing_bowl.jpg';
@@ -100,10 +103,7 @@ function ChefAlgo() {
 
     const [loadAlgo_check, setLoadAlgo_check] = useState(false)
 
-    // const [recipe1, set_recipe_1] = useState(null) 
-    // const [recipe2, set_recipe_2] = useState(null)
-    // const [recipe3, set_recipe_3] = useState(null)
-    // const [recipe4, set_recipe_4] = useState(null)
+    
 
     const [recipes, set_recipes] = useState(null)
 
@@ -115,6 +115,9 @@ function ChefAlgo() {
 
 
     const pre_heat = ["1. Set all stoves to low-medium heat", "2. Set oven to low-medium heat"]
+
+    const [square_layout, set_square_layout] = useState(true)
+
 
 
     useEffect(()=>{
@@ -390,6 +393,7 @@ function ChefAlgo() {
                                     if(recipe1 && recipe2 && recipe3 && recipe4){
                                         set_recipes({1: recipe1, 2: recipe2, 3: recipe3, 4: recipe4})
                                         set_upcoming_recipes_array([recipe_1_upcoming_FBID, recipe_2_upcoming_FBID, recipe_3_upcoming_FBID, recipe_4_upcoming_FBID])
+                                        //i.e. set stage to the next one: retrieval
                                         set_last_instruction_in_stage(true)
                                         resolve()
 
@@ -473,6 +477,14 @@ function ChefAlgo() {
     function oven(){
         console.log("starting oven")
         //let i = 0
+        
+        //wait till Next button pressed, then start timer if necessary
+        if( ((instruction_stage - 2) >= 0) && (recipes[recipe_cycle_number]["oven-steps"].length >= (instruction_stage - 2)) && (recipes[recipe_cycle_number]["oven-steps"].length !== 0) ){
+            if("duration" in recipes[recipe_cycle_number]["oven-steps"][instruction_stage - 2]){
+                createTimer(recipes[recipe_cycle_number]["oven-steps"][instruction_stage - 2]["step-number"], recipes[recipe_cycle_number]["oven-steps"][instruction_stage - 2]["duration"], to_do_steps[`upcoming_recipe_${recipe_cycle_number}_FBID`])
+            }
+        }
+        
         //loop through oven steps of each recipe and place on screen
         if(instruction_stage <= recipes[recipe_cycle_number]["oven-steps"].length){
             console.log("recipe: ", recipes[recipe_cycle_number]["name"])
@@ -499,14 +511,23 @@ function ChefAlgo() {
         console.log("starting base")
         
         //let i = 0
-        //loop through base steps of each recipe and place on screen
+        //wait till Next button pressed, then start timer if necessary
+        if( ((instruction_stage - 2) >= 0) && (recipes[recipe_cycle_number]["base-steps"].length >= (instruction_stage - 2)) && (recipes[recipe_cycle_number]["base-steps"].length !== 0) ){
+            if("duration" in recipes[recipe_cycle_number]["base-steps"][instruction_stage - 2]){
+                createTimer(recipes[recipe_cycle_number]["base-steps"][instruction_stage - 2]["step-number"], recipes[recipe_cycle_number]["base-steps"][instruction_stage - 2]["duration"], to_do_steps[`upcoming_recipe_${recipe_cycle_number}_FBID`])
+            }
+        }
+        
+        //loop through oven steps of each recipe and place on screen
         if(instruction_stage <= recipes[recipe_cycle_number]["base-steps"].length){
             console.log("recipe: ", recipes[recipe_cycle_number]["name"])
             
             set_current_recipe_name(recipes[recipe_cycle_number]["name"])
             set_on_screen_instruction(recipes[recipe_cycle_number]["base-steps"][instruction_stage - 1]["instruction"])
             set_current_instruction_object(recipes[recipe_cycle_number]["base-steps"][instruction_stage - 1])
+            
         }else{
+            
             if(recipe_cycle_number < recipe_total){
                 set_recipe_cycle_number(recipe_cycle_number + 1)
                 set_instruction_stage(1)
@@ -579,7 +600,7 @@ function ChefAlgo() {
 
     function stoveSecondary(){
 
-        QueueNextStep(upcoming_recipes_array)
+        
         
     }
 
@@ -688,133 +709,119 @@ function ChefAlgo() {
     //any steps that have 0 dependency (i.e. not waiting for other steps to complete
     //remove them from the upcoming recipe steps array and place in to_do steps array
     //================================================================================
-    function QueueNextStep(document_array){
-        console.log("queue next step ran again...")
+    // function QueueNextStep(){
+    //     console.log("queue next step ran again...")
 
-        let queue = setInterval(()=>{
-            
-            let x = 1;
-            //console.log("recipes length is: ", recipes.length)
-            for(x; x <= 4; x++){
-                // console.log(x.toString())
-                if(x === 1){
-                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"]).get()
-                    .then((snapshot)=>{
-                        if("info" in snapshot.data()){
-                            if(snapshot.data()["info"].length === 0){
-                                clearInterval(queue)
-                            }else{
+    //     setInterval(()=>{
+    //         console.log("queue next step interval ran again...")
+    //         console.log("todosteps: ", to_do_steps)
+
+    //         let x = 1;
+    //         //console.log("recipes length is: ", recipes.length)
+    //         for(x; x <= 4; x++){
+    //             // console.log(x.toString())
+    //             if(x === 1){
+    //                 db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"]).get()
+    //                 .then((snapshot)=>{
+    //                     if("info" in snapshot.data()){
+                            
                                 
-                                let i = 0;
-                                let recipeStepsArray = snapshot.data()["info"]
-                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
-                                for(i; i < recipeStepsArray.length; i++){
-                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
-                                        let toDoAddition = recipeStepsArray[i]
-                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
-                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
-                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
-                                        .then(()=>{
-                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"])
-                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
-                                        })
-                                    }
-                                }
-                            }
-                        }
+    //                         let i = 0;
+    //                         let recipeStepsArray = snapshot.data()["info"]
+    //                         let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+    //                         for(i; i < recipeStepsArray.length; i++){
+    //                             if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+    //                                 let toDoAddition = recipeStepsArray[i]
+    //                                 console.log("recipe step: ", JSON.stringify(toDoAddition))
+    //                                 console.log("dependency: ", recipeStepsArray[i]["step-info"]["step-dependency"])
+    //                                 db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+    //                                 .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+    //                                 .then(()=>{
+    //                                     db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_1_FBID"])
+    //                                 .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+    //                                 })
+    //                             }
+    //                         }
+    //                     }
                         
                         
-                    })
-                }else if(x === 2){
-                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"]).get()
-                    .then((snapshot)=>{
-                        if("info" in snapshot.data()){
-                            if(snapshot.data()["info"].length === 0){
-                                clearInterval(queue)
-                            }else{
-                                
-                                let i = 0;
-                                let recipeStepsArray = snapshot.data()["info"]
-                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
-                                for(i; i < recipeStepsArray.length; i++){
-                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
-                                        let toDoAddition = recipeStepsArray[i]
-                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
-                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
-                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
-                                        .then(()=>{
-                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"])
-                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
-                                        })
-                                    }
-                                }
-                            }
-                        }
+    //                 })
+    //             }else if(x === 2){
+    //                 db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"]).get()
+    //                 .then((snapshot)=>{
+    //                     if("info" in snapshot.data()){
+    //                         let i = 0;
+    //                         let recipeStepsArray = snapshot.data()["info"]
+    //                         let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+    //                         for(i; i < recipeStepsArray.length; i++){
+    //                             if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+    //                                 let toDoAddition = recipeStepsArray[i]
+    //                                 console.log("recipe step: ", JSON.stringify(toDoAddition))
+    //                                 db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+    //                                 .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+    //                                 .then(()=>{
+    //                                     db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_2_FBID"])
+    //                                 .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+    //                                 })
+    //                             }
+    //                         }
+    //                     }
                         
                         
-                    })
-                }else if(x === 3){
-                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"]).get()
-                    .then((snapshot)=>{
-                        if("info" in snapshot.data()){
-                            if(snapshot.data()["info"].length === 0){
-                                clearInterval(queue)
-                            }else{
-                                
-                                let i = 0;
-                                let recipeStepsArray = snapshot.data()["info"]
-                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
-                                for(i; i < recipeStepsArray.length; i++){
-                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
-                                        let toDoAddition = recipeStepsArray[i]
-                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
-                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
-                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
-                                        .then(()=>{
-                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"])
-                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
-                                        })
-                                    }
-                                }
-                            }
-                        }
-                    })
+    //                 })
+    //             }else if(x === 3){
+    //                 db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"]).get()
+    //                 .then((snapshot)=>{
+    //                     if("info" in snapshot.data()){                                
+    //                         let i = 0;
+    //                         let recipeStepsArray = snapshot.data()["info"]
+    //                         let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+    //                         for(i; i < recipeStepsArray.length; i++){
+    //                             if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+    //                                 let toDoAddition = recipeStepsArray[i]
+    //                                 console.log("recipe step: ", JSON.stringify(toDoAddition))
+    //                                 db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+    //                                 .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+    //                                 .then(()=>{
+    //                                     db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_3_FBID"])
+    //                                 .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+    //                                 })
+    //                             }
+    //                         }
+    //                     }
+    //                 })
                             
                             
-                }else if(x === 4){
+    //             }else if(x === 4){
         
-                    db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"]).get()
-                    .then((snapshot)=>{
-                        if("info" in snapshot.data()){
-                            if(snapshot.data()["info"].length === 0){
-                                clearInterval(queue)
-                            }else{
-                                
-                                let i = 0;
-                                let recipeStepsArray = snapshot.data()["info"]
-                                let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
-                                for(i; i < recipeStepsArray.length; i++){
-                                    if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
-                                        let toDoAddition = recipeStepsArray[i]
-                                        console.log("recipe step: ", JSON.stringify(toDoAddition))
-                                        db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
-                                        .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
-                                        .then(()=>{
-                                            db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"])
-                                        .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
-                                        })
-                                    }
-                                }
-                            }
-                        }
+    //                 db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"]).get()
+    //                 .then((snapshot)=>{
+    //                     if("info" in snapshot.data()){
+                            
+    //                         let i = 0;
+    //                         let recipeStepsArray = snapshot.data()["info"]
+    //                         let to_do_steps_instance_FBID = snapshot.data()["to_do_steps_instance_FBID"]
+    //                         for(i; i < recipeStepsArray.length; i++){
+    //                             if(recipeStepsArray[i]["step-info"]["step-dependency"].length === 0){
+    //                                 let toDoAddition = recipeStepsArray[i]
+    //                                 console.log("recipe step: ", JSON.stringify(toDoAddition))
+    //                                 db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+    //                                 .update({"steps": firebase.firestore.FieldValue.arrayUnion(toDoAddition)})
+    //                                 .then(()=>{
+    //                                     db.collection("upcoming-recipes").doc(to_do_steps["upcoming_recipe_4_FBID"])
+    //                                 .update({"info": firebase.firestore.FieldValue.arrayRemove(toDoAddition)})
+    //                                 })
+    //                             }
+    //                         }
+    //                     }
                         
                         
-                    })
-                }                
-            }
+    //                 })
+    //             }                
+    //         }
             
-        }, 5000)
-    }
+    //     }, 5000)
+    // }
     
     
         
@@ -828,12 +835,6 @@ function ChefAlgo() {
         console.log("running stage complete")
 
         if(stage === "LOAD"){
-            setStage('BASE')
-            set_last_instruction_in_stage(false)
-            set_instruction_stage(1)
-            set_recipe_cycle_number(1)
-        }
-        else if(stage === 'BASE'){
             setStage('RETRIEVAL')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -846,12 +847,30 @@ function ChefAlgo() {
             set_recipe_cycle_number(1)
         }
         else if(stage === 'PREP'){
+            setStage('QUEUE_NEXT_STEP')
+            set_last_instruction_in_stage(false)
+            set_instruction_stage(1)
+            set_recipe_cycle_number(1)
+        }
+        else if(stage === 'QUEUE_NEXT_STEP'){
             setStage('OVEN')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
         }
         else if(stage === 'OVEN'){
+            setStage('BASE')
+            set_last_instruction_in_stage(false)
+            set_instruction_stage(1)
+            set_recipe_cycle_number(1)
+        }
+        else if(stage === 'BASE'){
+            setStage('PRE-HEAT')
+            set_last_instruction_in_stage(false)
+            set_instruction_stage(1)
+            set_recipe_cycle_number(1)
+        }
+        else if(stage === 'PRE-HEAT'){
             setStage('STOVE-PRELIM')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
@@ -896,6 +915,7 @@ function ChefAlgo() {
                     loadAlgo()
                 }
                 else if (stage === 'RETRIEVAL'){
+                    set_app_starting(false)
                     console.log("program chosen: ingredientRetrieval")
                     
                     ingredientRetrieval()
@@ -904,6 +924,9 @@ function ChefAlgo() {
                     console.log("program chosen: prep")
 
                     prep()
+                }else if(stage === 'QUEUE_NEXT_STEP'){
+                    // QueueNextStep()
+                    setStage("OVEN")
                 }
                 else if(stage === 'OVEN'){
                     console.log("program chosen: oven")
@@ -930,10 +953,136 @@ function ChefAlgo() {
     }
 
 
+    //=================================================================================================================
+    //                          RETURN STATEMENTS
+    //=================================================================================================================
+
+    //=====================================================
+    //   IF JUST STARTING TELL USER TO CLICK START
+    //=====================================================
+
+    if(stage === null){
+        return(
+            <div style={{"padding": "15px"}} >
+                <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
+                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
+                    <Col>
+                        <h1>Please read then press Start button to begin</h1>
+                    </Col>
+                </Row>
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                <Row>
+                    <Col>
+                        <Container>
+                        <h5>
+                                This model is built on the premise that ALL the ingredients
+                                required for ALL of the meals that will be cooked, will already be chopped/grated/sliced/prepared
+                                and stored in labelled small storage cases, stored in large walk-in fridges
+                                in an industrial kitchen. 
+                            </h5>
+                            <br/>
+
+                            <h5>
+                                This is done so that the chef can monitor all hobs at the same
+                                time, without having to divert their attention to chop and prepare ingredients.
+                                With this model the chef will only have to pick up the prepared ingredients and place them into
+                                the pot/pan in which the meal is being cooked on the hob - a quick step where the chef's
+                                attention is not diverted so that he/she can continue monitoring and cooking the 
+                                other meals.
+                            </h5>
+
+                            <br/>
+
+                            <h5>
+                                Since you will be using this model at home, and won't have pre-cut and
+                                pre-prepared ingredients sitting in labelled and easily accessible storage, 
+                                you will have to prepare these ingredients yourself and keep them separate
+                                (whilst keeping track of which ingredients they are and which meals they are for!).
+                            </h5>
+                        </Container>
+                    </Col>
+                </Row>
+
+                <br/>
+                <br/>
+
+                <Row>
+                    <Col>
+                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                            setStage('REQUIREMENTS')
+                            set_app_starting(true)
+                            set_instruction_stage(instruction_stage + 1)
+                            set_recipe_cycle_number(recipe_cycle_number + 1)
+                            // program()
+                            
+                            setNextClick(true)
+                            }}> Start 
+                        </Button>
+                        }
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
+
+    else if(stage === "REQUIREMENTS"){
+        return(
+            <div style={{"padding": "15px"}} >
+                <h1 style={{"color": "#FF9F33"}}>Actual</h1>
+
+                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
+                    <Col>
+                        <h1> Requirements: </h1>
+                    </Col>
+                </Row>
+
+                <br/>
+
+                <h5>You will need: </h5>
+                <Container>
+                    <Card>
+                        Small item organiser / 4 large plates (i)
+                    </Card>
+                    <br/>
+                    <Card>
+                        2 Woks/Frying Pans
+                    </Card>
+                    <br/>
+                    <Card>
+                       2 Pots 
+                    </Card>
+                    <br/>
+                    <Card>
+                        4 induction hobs
+                    </Card>
+                    
+                    
+                </Container>
+                <br/>
+                
+                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                    setStage("LOAD")
+                    set_app_starting(true)
+                    set_instruction_stage(instruction_stage + 1)
+                    set_recipe_cycle_number(recipe_cycle_number + 1)
+                    // program()
+                    
+                    setNextClick(true)
+                }}>Next</Button>
+            </div>
+        )
+    }
+
+
     //=====================================================
     //  IF PRE-HEAT STAGE THEN SHOW PRE-HEAT INSTRUCTIONS
     //=====================================================
-    if(stage === "PRE-HEAT"){
+    else if(stage === "PRE-HEAT"){
         return(
             
             <Container>
@@ -954,7 +1103,7 @@ function ChefAlgo() {
                                 return(
                                     <div>
                                         <Card>
-                                           <h3> {item} </h3> 
+                                           <h3 key={index}> {item} </h3> 
                                         </Card>
                                         <br/>
                                         
@@ -965,8 +1114,8 @@ function ChefAlgo() {
 
                         <Col>
                             <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                                setStage("LOAD")
-                                set_app_starting(true)
+                                setStage("STOVE-PRELIM")
+                                
                                 set_instruction_stage(instruction_stage + 1)
                                 set_recipe_cycle_number(recipe_cycle_number + 1)
                                 // program()
@@ -984,345 +1133,11 @@ function ChefAlgo() {
 
 
 
-
-    //===========================================================
-    // IF STOVE-SECONDARY STAGE, SHOW 4 STOVES AND INSTRUCTIONS
-    //===========================================================
-    else if( (stage === "STOVE-SECONDARY") || (stage === "STOVE-PRELIM") ){
-        return (
-            
-            <Container>
-                <h1 style={{"color": "#FF9F33"}}>Actual</h1>
-                <audio ref={audioPlayer} src={NewNotification} />
-                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white", "margin-bottom": "10px"}}>
-                    <Col>
-                        <h2>Stage: {stage}</h2> 
-                    </Col>
-
-                    <Col>
-                    { (to_do_steps !== undefined) && 
-                        (
-                            (to_do_steps["steps"].length > 0) && 
-                            <div>
-
-                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                                    console.log("======================================")
-                                    console.log("BACK BUTTON PRESSED")
-                                    console.log("======================================")
-                                    set_consecutive_back_presses(consecutive_back_presses + 1)
-                                    }}>
-                                    Back
-                                </Button>
-                                <Button style={{"margin": "10px"}} variant="contained" style={{"margin": "auto 0"}} onClick={()=>{
-
-                                    if(consecutive_back_presses >= 0){
-                                        set_consecutive_back_presses(consecutive_back_presses - 1)
-                                    }else{
-                                        //let temp_completed = completed_steps
-                                        console.log("======================================")
-                                        console.log("NEXT BUTTON PRESSED")
-                                        console.log("======================================")
-                                        //temp_completed.unshift(on_screen_instruction)
-                                        set_completed_steps(completed_steps => [{"stage": stage, "instruction": to_do_steps["steps"][0]}, ...completed_steps])
-                                        if(to_do_steps["steps"].length > 0){
-
-                                            
-                                        
-                                            console.log("NEXT BUTTON")
-                                            console.log("Duration 1: ", recipe_1_timer.toString())
-                                            console.log("Duration 2: ", recipe_2_timer.toString())
-                                            console.log("Duration 3: ", recipe_3_timer.toString())
-                                            console.log("Duration 4: ", recipe_4_timer.toString())
-    
-                                            if(to_do_steps["steps"][0]["recipe-number"] === 1){
-                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
-                                                set_recipe_1_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
-
-                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_1_FBID"])
-                                            }
-                                            if(to_do_steps["steps"][0]["recipe-number"] === 2){
-                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
-                                                set_recipe_2_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
-
-                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_2_FBID"])
-                                            }
-                                            if(to_do_steps["steps"][0]["recipe-number"] === 3){
-                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
-                                                set_recipe_3_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
-
-                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_3_FBID"])
-                                            }
-                                            if(to_do_steps["steps"][0]["recipe-number"] === 4){
-                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
-                                                set_recipe_4_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
-
-                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_4_FBID"])
-                                            }
-    
-                                            
-    
-                                            console.log("old to do steps: ", JSON.stringify(to_do_steps))
-    
-                                            let toRemove = to_do_steps["steps"][0]
-    
-                                            db.collection("to-do-steps").doc(to_do_steps_instance_FBID).update({
-                                                "steps": firebase.firestore.FieldValue.arrayRemove(toRemove)
-                                            });
-                                            // console.log("current instruction object: ", JSON.stringify(current_instruction_object))
-    
-                                        }
-                                        setNextClick(true)
-                                    }
-
-
-
-                                    
-
-
-                                    }}>Next
-                                    </Button> 
-                                    
-                            </div>
-                            
-                        )
-                    }
-                    </Col>
-                    
-                </Row>
-            
-                <Row>
-                    <Col >
-
-                        <Container>
-
-                            <Row lg={2} md={2} style={{"border": "solid", "height": 0.4 * window.innerHeight}}>
-                                <Col style={{"border": "solid", "backgroundColor": background_colour_1}}>
-                                    {recipe_1_upcoming.length > 0 ? <h2>{recipe_1_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
-                                    {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_1_timer} secs...</h5> : null} */}
-                                    {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/60)) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (recipe_1_timer / 60) : '00'}:{ 59 >= (recipe_1_timer) ? (recipe_1_timer) : '00'}</h5> : null} */}
-                                    {(recipe_1_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/(60*60))) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (Math.floor(recipe_1_timer / 60)) : '00'}:{ (59 >= (recipe_1_timer%60)) ? (recipe_1_timer%60) : '00'}</h5> : null}
-
-                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
-                                </Col >
-                                
-                                <Col style={{"border": "solid", "backgroundColor": background_colour_2}}>
-                                    <div>
-                                        {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
-                                        {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
-                                        {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/60)) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (recipe_2_timer / 60) : '00'}:{ 59 >= (recipe_2_timer) ? (recipe_2_timer) : '00'}</h5> : null} */}
-                                        {(recipe_2_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/(60*60))) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (Math.floor(recipe_2_timer / 60)) : '00'}:{ (59 >= (recipe_2_timer%60)) ? (recipe_2_timer%60) : '00'}</h5> : null}
-
-                                    </div>
-
-                                    <div>
-                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
-
-                                    </div>
-                                    
-                                </Col>
-                            </Row>
-
-                            <Row lg={2} md={2} style={{"border": "solid", "height": 0.4 * window.innerHeight}}>
-
-                                <Col style={{"border": "solid", "backgroundColor": background_colour_3}}>
-                                    {recipe_3_upcoming.length > 0 ? <h2>{recipe_3_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
-                                    {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_3_timer} secs...</h5> : null}                                     */}
-                                    {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/60)) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (recipe_3_timer / 60) : '00'}:{ 59 >= (recipe_3_timer) ? (recipe_3_timer) : '00'}</h5> : null} */}
-                                    {(recipe_3_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/(60*60))) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (Math.floor(recipe_3_timer / 60)) : '00'}:{ (59 >= (recipe_3_timer%60)) ? (recipe_3_timer%60) : '00'}</h5> : null}
-
-                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
-                                </Col>
-
-                                <Col style={{"border": "solid", "backgroundColor": background_colour_4}}>
-                                    {recipe_4_upcoming.length > 0 ? <h2>{recipe_4_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
-                                    {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_4_timer} secs...</h5> : null} */}
-                                    {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/60)) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (recipe_4_timer / 60) : '00'}:{ 59 >= (recipe_4_timer) ? (recipe_4_timer) : '00'}</h5> : null} */}
-                                    {(recipe_4_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/(60*60))) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (Math.floor(recipe_4_timer / 60)) : '00'}:{ (59 >= (recipe_4_timer%60)) ? (recipe_4_timer%60) : '00'}</h5> : null}
-
-                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
-                                </Col>
-
-                            </Row>
-
-                        </Container>                                
-
-                    </Col>
-
-
-                    <Col lg={5} md={3} sm={3} style={{"border": "solid", "height": 0.8 * window.innerHeight, "margin": "auto"}}>
-                        
-                        {consecutive_back_presses >= 0 ?
-                            (completed_steps.length > 0 && 
-                                <div>
-                                    {completed_steps[consecutive_back_presses]["stage"] === "STOVE-SECONDARY" ? 
-                                    <div>
-                                        <h3 style={{"color": "red", "opacity": "50%"}}>Previous Instruction:</h3>
-                                        <h4>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h4>
-                                        <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
-                                        <h4 style={{"color": "red", "opacity": "50%"}}>{completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
-                                    </div>
-                                    :
-                                    <div>
-                                        <h3 style={{"color": "red", "opacity": "50%"}}>Previous Instruction:</h3>
-                                        <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
-                                        <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
-                                        <h4 style={{"color": "red", "opacity": "50%"}}>{completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
-
-                                    </div>
-                                    
-                                    }                                
-                                </div>
-                            ) 
-                        :
-                        
-                        (to_do_steps) ?
-
-                            (
-                                (to_do_steps["steps"].length > 0) ?
-                                                        
-                                    <div>
-                                        {/* {console.log("current instruction object: ", current_instruction_object)} */}
-                                        <h2>Stove: {to_do_steps["steps"][0]["recipe-number"]}</h2>
-                                        <h4 style={{"color": "green", "opacity": "50%"}}>Current Instruction:</h4>
-                                        <h3>Meal: {to_do_steps["steps"][0]["recipe-name"]}</h3>
-                                        
-                                        <br/>
-                                        <h4 style={{"color": "green", "opacity": "50%"}}>{to_do_steps["steps"][0]["step-info"]["instruction"]}</h4>
-
-                                        
-                                        {/* <br/>
-                                        <br/>
-                                        <br/> */}
-
-                                        {/* {completed_steps.length > 0 && 
-                                        <div>
-                                            <h3>Previous Step:</h3>
-                                            {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
-                                            <div>
-                                                <h4 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h4>
-                                                <h4 style={{"color": "red", "opacity": "50%"}}>Recipe: {completed_steps[0]["instruction"]["recipe-name"]}</h4>
-                                                <h4 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]["step-info"]["instruction"]}</h4>
-                                            </div>
-                                            :
-                                            <div>
-                                                <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
-                                                <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
-                                            </div>
-                                            
-                                            }
-                                            
-                                        </div>
-                                        } */}
-                                    </div>
-                                    :
-                                    <div>
-                                        <h3>Stir all pots while awaiting next steps...</h3>
-                                        <br/>
-                                        <br/>
-                                        <br/>
-
-                                        {/* {completed_steps.length > 0 && 
-                                        <div>
-                                            <h3>Previous Step:</h3>
-                                                {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
-                                                <div>
-                                                    <h4 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h4>
-                                                    <h4 style={{"color": "red", "opacity": "50%"}}>Recipe: {completed_steps[0]["instruction"]["recipe-name"]}</h4>
-                                                    <h4 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]["step-info"]["instruction"]}</h4>
-                                                </div>
-                                                :
-                                                <div>
-                                                    <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
-                                                    <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
-                                                </div>
-                                                
-                                                }
-                                        </div>
-                                        } */}
-                                    </div>
-                                    
-                                    
-                            )
-                            
-                            
-                            :
-                            <div>
-                              <h3>Loading next steps...</h3>
-                              <br/>
-                              <br/>
-                              <br/>
-
-                            {/* {completed_steps.length > 0 && 
-                            <div>
-                                <h3>Previous Step:</h3>
-                                {completed_steps[0]["stage"] === "STOVE-SECONDARY" ? 
-                                    <div>
-                                        <h4 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h4>
-                                        <h4 style={{"color": "red", "opacity": "50%"}}>Recipe: {completed_steps[0]["instruction"]["recipe-name"]}</h4>
-                                        <h4 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]["step-info"]["instruction"]}</h4>
-                                    </div>
-                                    :
-                                    <div>
-                                        <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
-                                        <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
-                                    </div>
-                                    
-                                }
-                            </div>} */}
-                            </div>
-                            
-                                
-                            
-                        }
-
-                    </Col>
-                </Row>
-            </Container>
-            
-        );
-    }
-
     //=====================================================
-    //   IF JUST STARTING TELL USER TO CLICK START
-    //=====================================================
-
-    else if(stage === null){
-        return(
-            <div style={{"padding": "15px"}} >
-                <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
-                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
-                    <Col>
-                        <h1>Press Start button to begin</h1>
-                    </Col>
-                </Row>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <Row>
-                    <Col>
-                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                            setStage('PRE-HEAT')
-                            set_app_starting(true)
-                            set_instruction_stage(instruction_stage + 1)
-                            set_recipe_cycle_number(recipe_cycle_number + 1)
-                            // program()
-                            
-                            setNextClick(true)
-                            }}> Start 
-                        </Button>
-                        }
-                    </Col>
-                </Row>
-            </div>
-        )
-    }
-
-    //=====================================================
-    //   IF BASE/RETRIEVAL/OVEN/PREP STAGE SHOW 4 BOWLS 
+    //   IF BASE/RETRIEVAL/OVEN/PREP/LOAD STAGE SHOW 4 BOWLS 
     //   AND INSTRUCTIONS FOR EACH BOWL/RECIPE
     //=====================================================
-    else{
+    else if((stage === "LOAD") || (stage === "RETRIEVAL") || (stage === "PREP") || (stage === "OVEN") || (stage === "BASE") ){
         return (
             app_starting ? 
             <div style={{"display": "flex",
@@ -1379,7 +1194,7 @@ function ChefAlgo() {
 
 
 
-                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                        {/* { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                             setStage('LOAD')
                             set_app_starting(true)
                             set_instruction_stage(instruction_stage + 1)
@@ -1389,7 +1204,7 @@ function ChefAlgo() {
                             setNextClick(true)
                             }}> Start 
                         </Button>
-                        }
+                        } */}
                     </Col>
                 </Row>
                 <br/>
@@ -1465,32 +1280,500 @@ function ChefAlgo() {
                     </Container>
                 </Row>
 
-                {/* <Row>
-                    <h3>Previous Instruction:</h3>
-                    {(consecutive_back_presses >= 0 && completed_steps.length > 0) ?    
-                        <div>
-                            <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
-                            <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>
-                        </div>
-                         
-                        :
-
-                        (completed_steps.length > 0 && 
-
-                            <div>                            
-                                <h3 style={{"color": "red", "opacity": "50%"}}>Stage: {completed_steps[0]["stage"]}</h3>
-                                <h3 style={{"color": "red", "opacity": "50%"}}>Instruction: {completed_steps[0]["instruction"]}</h3>   
-                            </div>
-                        )
-                        
-                    }
-                </Row> */}
     
             </div>
                 
         );
 
     }
+
+
+
+    //===========================================================
+    // IF STOVE-SECONDARY STAGE, SHOW 4 STOVES AND INSTRUCTIONS
+    //===========================================================
+    else if( (stage === "STOVE-SECONDARY") || (stage === "STOVE-PRELIM") ){
+        return (
+
+            square_layout ?
+            
+            //===========================================================
+            //              SQUARE LAYOUT FOR STOVE
+            //===========================================================
+            <Container>
+                <h1 style={{"color": "#FF9F33"}}>Actual</h1>
+                <FormGroup>
+                    <FormControlLabel control={<Switch checked={!square_layout} onChange={()=>{set_square_layout(!square_layout)}} name="layout_changer"/>} label="Change to Horizontal Stove Layout" />
+                </FormGroup>
+                <audio ref={audioPlayer} src={NewNotification} autoPlay/>
+                
+                {/*      ROW IS HEADER BAR      */}
+                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white", "margin-bottom": "10px"}}>
+                    <Col>
+                        <h2>Stage: {stage}</h2> 
+                    </Col>
+
+                    <Col>
+                    { (to_do_steps) && 
+                        (
+                            (to_do_steps["steps"].length > 0) && 
+                            <div>
+
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                                    console.log("======================================")
+                                    console.log("BACK BUTTON PRESSED")
+                                    console.log("======================================")
+                                    set_consecutive_back_presses(consecutive_back_presses + 1)
+                                    }}>
+                                    Back
+                                </Button>
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+
+                                    if(consecutive_back_presses >= 0){
+                                        set_consecutive_back_presses(consecutive_back_presses - 1)
+                                    }else{
+                                        //let temp_completed = completed_steps
+                                        console.log("======================================")
+                                        console.log("NEXT BUTTON PRESSED")
+                                        console.log("======================================")
+                                        //temp_completed.unshift(on_screen_instruction)
+                                        set_completed_steps(completed_steps => [{"stage": stage, "instruction": to_do_steps["steps"][0]}, ...completed_steps])
+                                        if(to_do_steps["steps"].length > 0){
+
+                                            
+                                        
+                                            console.log("NEXT BUTTON")
+                                            console.log("Duration 1: ", recipe_1_timer.toString())
+                                            console.log("Duration 2: ", recipe_2_timer.toString())
+                                            console.log("Duration 3: ", recipe_3_timer.toString())
+                                            console.log("Duration 4: ", recipe_4_timer.toString())
+    
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 1){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_1_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_1_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 2){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_2_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_2_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 3){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_3_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_3_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 4){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_4_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_4_FBID"])
+                                            }
+    
+                                            
+    
+                                            console.log("old to do steps: ", JSON.stringify(to_do_steps))
+    
+                                            let toRemove = to_do_steps["steps"][0]
+    
+                                            db.collection("to-do-steps").doc(to_do_steps_instance_FBID).update({
+                                                "steps": firebase.firestore.FieldValue.arrayRemove(toRemove)
+                                            });
+                                            console.log("current instruction object: ", JSON.stringify(current_instruction_object))
+    
+                                        }
+                                        setNextClick(true)
+                                    }
+
+
+
+                                    
+
+
+                                    }}>Next
+                                    </Button> 
+                                    
+                            </div>
+                            
+                        )
+                    }
+                    </Col>
+                    
+                </Row>
+            
+
+                {/* ACTUAL LAYOUT STARTS HERE */}
+                <Row>
+                    <Col >
+
+                        <Container>
+
+                            <Row lg={2} md={2} style={{"height": 0.4 * window.innerHeight}}>
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_1}}>
+                                    {recipe_1_upcoming.length > 0 ? <h2>{recipe_1_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_1_timer} secs...</h5> : null} */}
+                                    {(recipe_1_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/(60*60))) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (Math.floor(recipe_1_timer / 60)) : '00'}:{ (59 >= (recipe_1_timer%60)) ? (recipe_1_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
+                                </Col >
+                                
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_2}}>
+                                    <div>
+                                        {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                        {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
+                                        {(recipe_2_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/(60*60))) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (Math.floor(recipe_2_timer / 60)) : '00'}:{ (59 >= (recipe_2_timer%60)) ? (recipe_2_timer%60) : '00'}</h5> : null}
+
+                                    </div>
+
+                                    <div>
+                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
+
+                                    </div>
+                                    
+                                </Col>
+                            </Row>
+
+                            <Row lg={2} md={2} style={{"height": 0.4 * window.innerHeight}}>
+
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_3}}>
+                                    {recipe_3_upcoming.length > 0 ? <h2>{recipe_3_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_3_timer} secs...</h5> : null}                                     */}
+                                    {(recipe_3_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/(60*60))) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (Math.floor(recipe_3_timer / 60)) : '00'}:{ (59 >= (recipe_3_timer%60)) ? (recipe_3_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
+                                </Col>
+
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_4}}>
+                                    {recipe_4_upcoming.length > 0 ? <h2>{recipe_4_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_4_timer} secs...</h5> : null} */}
+                                    {(recipe_4_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/(60*60))) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (Math.floor(recipe_4_timer / 60)) : '00'}:{ (59 >= (recipe_4_timer%60)) ? (recipe_4_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.25 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.25 }} src={Black_Circle} alt="black stove" />
+                                </Col>
+
+                            </Row>
+
+                        </Container>                                
+
+                    </Col>
+
+
+                    <Col lg={5} md={3} sm={3} style={{"border": "solid", "height": 0.8 * window.innerHeight, "margin": "auto"}}>
+                        
+                        {consecutive_back_presses >= 0 ?
+                            (completed_steps.length > 0 && 
+                                <div style={{"overflowY": "scroll"}}>
+                                    {completed_steps[consecutive_back_presses]["stage"] === "STOVE-SECONDARY" ? 
+                                    <div>
+                                        <h4>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h4>
+                                        <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
+                                        <h4>Instruction: {completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
+                                    </div>
+                                    :
+                                    <div>
+                                        <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
+                                        <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>   
+                                    </div>
+                                    
+                                    }                                
+                                </div>
+                            ) 
+                        :
+                        
+                        (to_do_steps) ?
+
+                            (
+                                (to_do_steps["steps"].length > 0) ?
+                                                        
+                                    <div>
+                                        {/* {console.log("current instruction object: ", current_instruction_object)} */}
+                                        <h2>Stove: {to_do_steps["steps"][0]["recipe-number"]}</h2>
+                                        <h3>Meal: {to_do_steps["steps"][0]["recipe-name"]}</h3>
+                                        <h4>Instruction: {to_do_steps["steps"][0]["step-info"]["instruction"]}</h4>
+                                        
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                
+                                    </div>
+                                    :
+                                    <div>
+                                        <h3>Stir all pots while awaiting next steps...</h3>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                    
+                                    </div>
+                                    
+                                    
+                            )
+                            
+                            
+                            :
+                            <div>
+                              <h3>Loading next steps...</h3>
+                              <br/>
+                              <br/>
+                              <br/>
+
+                            </div>
+                            
+                                
+                            
+                        }
+
+                    </Col>
+                </Row>
+            </Container>
+
+            :
+            
+
+            //===========================================================
+            //              HORIZONTAL LAYOUT FOR STOVE
+            //===========================================================
+            <Container>
+                <h1 style={{"color": "#FF9F33"}}>Actual</h1>
+                <FormGroup>
+                    <FormControlLabel control={<Switch checked={square_layout} onChange={()=>{set_square_layout(!square_layout)}} name="layout_changer"/>} label="Change to Square Stove Layout" />
+                </FormGroup>
+                <audio ref={audioPlayer} src={NewNotification} autoPlay/>
+                
+                {/* HEADER */}
+                <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white", "margin-bottom": "10px"}}>
+                    <Col>
+                        <h2>Stage: {stage}</h2> 
+                    </Col>
+
+                    <Col>
+                    { (to_do_steps) && 
+                        (
+                            (to_do_steps["steps"].length > 0) && 
+                            <div>
+
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+                                    console.log("======================================")
+                                    console.log("BACK BUTTON PRESSED")
+                                    console.log("======================================")
+                                    set_consecutive_back_presses(consecutive_back_presses + 1)
+                                    }}>
+                                    Back
+                                </Button>
+                                <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
+
+                                    if(consecutive_back_presses >= 0){
+                                        set_consecutive_back_presses(consecutive_back_presses - 1)
+                                    }else{
+                                        //let temp_completed = completed_steps
+                                        console.log("======================================")
+                                        console.log("NEXT BUTTON PRESSED")
+                                        console.log("======================================")
+                                        //temp_completed.unshift(on_screen_instruction)
+                                        set_completed_steps(completed_steps => [{"stage": stage, "instruction": to_do_steps["steps"][0]}, ...completed_steps])
+                                        if(to_do_steps["steps"].length > 0){
+
+                                            
+                                        
+                                            console.log("NEXT BUTTON")
+                                            console.log("Duration 1: ", recipe_1_timer.toString())
+                                            console.log("Duration 2: ", recipe_2_timer.toString())
+                                            console.log("Duration 3: ", recipe_3_timer.toString())
+                                            console.log("Duration 4: ", recipe_4_timer.toString())
+    
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 1){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_1_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_1_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 2){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_2_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_2_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 3){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_3_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_3_FBID"])
+                                            }
+                                            if(to_do_steps["steps"][0]["recipe-number"] === 4){
+                                                console.log("duration timer set to: ", (to_do_steps["steps"][0]["step-info"]["duration"]).toString())
+                                                set_recipe_4_timer(to_do_steps["steps"][0]["step-info"]["duration"] * 60)
+
+                                                createTimer(to_do_steps["steps"][0]["step-info"]["step-number"], to_do_steps["steps"][0]["step-info"]["duration"], to_do_steps["upcoming_recipe_4_FBID"])
+                                            }
+    
+                                            
+    
+                                            console.log("old to do steps: ", JSON.stringify(to_do_steps))
+    
+                                            let toRemove = to_do_steps["steps"][0]
+    
+                                            db.collection("to-do-steps").doc(to_do_steps_instance_FBID).update({
+                                                "steps": firebase.firestore.FieldValue.arrayRemove(toRemove)
+                                            });
+                                            console.log("current instruction object: ", JSON.stringify(current_instruction_object))
+    
+                                        }
+                                        setNextClick(true)
+                                    }
+
+
+
+                                    
+
+
+                                    }}>Next
+                                    </Button> 
+                                    
+                            </div>
+                            
+                        )
+                    }
+                    </Col>
+                    
+                </Row>
+
+
+
+                {/* ACTUAL LAYOUT STARTS HERE */}
+                <Row>
+
+                    <Row lg={1} md={1} sm={1} style={{"border": "solid", "height": 0.35 * window.innerHeight, "margin": "auto", "marginBottom": "10px"}}>
+                        
+                        {consecutive_back_presses >= 0 ?
+                            (completed_steps.length > 0 && 
+                                <div style={{"overflowY": "scroll"}}>
+                                    {completed_steps[consecutive_back_presses]["stage"] === "STOVE-SECONDARY" ? 
+                                    <div>
+                                        <h4>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h4>
+                                        <h4>Recipe: {completed_steps[consecutive_back_presses]["instruction"]["recipe-name"]}</h4>
+                                        <h4>Instruction: {completed_steps[consecutive_back_presses]["instruction"]["step-info"]["instruction"]}</h4>
+                                    </div>
+                                    :
+                                    <div>
+                                        <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
+                                        <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>   
+                                    </div>
+                                    
+                                    }                                
+                                </div>
+                            ) 
+                        :
+                        
+                        (to_do_steps) ?
+
+                            (
+                                (to_do_steps["steps"].length > 0) ?
+                                                        
+                                    <div>
+                                        {/* {console.log("current instruction object: ", current_instruction_object)} */}
+                                        <h2>Stove: {to_do_steps["steps"][0]["recipe-number"]}</h2>
+                                        <h3>Meal: {to_do_steps["steps"][0]["recipe-name"]}</h3>
+                                        <h4>Instruction: {to_do_steps["steps"][0]["step-info"]["instruction"]}</h4>
+                                        
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                
+                                    </div>
+                                    :
+                                    <div>
+                                        <h3>Stir all pots while awaiting next steps...</h3>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                    
+                                    </div>
+                                )
+                            
+                            :
+                            <div>
+                              <h3>Loading next steps...</h3>
+                              <br/>
+                              <br/>
+                              <br/>
+
+                            </div>
+                            
+                                
+                            
+                        }
+
+                    </Row>
+
+
+                    <Row lg={1} md={1}>
+
+                        <Container>
+
+                            <Row lg={4} md={4} style={{"height": window.innerHeight * 0.35}}>
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_1}}>
+                                    {recipe_1_upcoming.length > 0 ? <h2>{recipe_1_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_1_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_1_timer} secs...</h5> : null} */}
+                                    {(recipe_1_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_1_timer / (60*60)) >= 1 ? (Math.floor(recipe_1_timer/(60*60))) : ('00')}:{(59 >= (recipe_1_timer / 60) && (recipe_1_timer / 60)  >= 1) ? (Math.floor(recipe_1_timer / 60)) : '00'}:{ (59 >= (recipe_1_timer%60)) ? (recipe_1_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.2 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.2 }} src={Black_Circle} alt="black stove" />
+                                </Col >
+                                
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_2}}>
+                                    <div>
+                                        {recipe_2_upcoming.length > 0 ? <h2>{recipe_2_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                        {/* {(recipe_2_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_2_timer} secs...</h5> : null}                                         */}
+                                        {(recipe_2_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_2_timer / (60*60)) >= 1 ? (Math.floor(recipe_2_timer/(60*60))) : ('00')}:{(59 >= (recipe_2_timer / 60) && (recipe_2_timer / 60)  >= 1) ? (Math.floor(recipe_2_timer / 60)) : '00'}:{ (59 >= (recipe_2_timer%60)) ? (recipe_2_timer%60) : '00'}</h5> : null}
+
+                                    </div>
+
+                                    <div>
+                                    <img style={{"width": window.innerWidth * 0.2 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.2 }} src={Black_Circle} alt="black stove" />
+
+                                    </div>
+                                    
+                                </Col>
+                            
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_3}}>
+                                    {recipe_3_upcoming.length > 0 ? <h2>{recipe_3_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_3_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_3_timer} secs...</h5> : null}                                     */}
+                                    {(recipe_3_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_3_timer / (60*60)) >= 1 ? (Math.floor(recipe_3_timer/(60*60))) : ('00')}:{(59 >= (recipe_3_timer / 60) && (recipe_3_timer / 60)  >= 1) ? (Math.floor(recipe_3_timer / 60)) : '00'}:{ (59 >= (recipe_3_timer%60)) ? (recipe_3_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.2 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.2 }} src={Black_Circle} alt="black stove" />
+                                </Col>
+
+                                <Col style={{"border": "solid", "backgroundColor": background_colour_4}}>
+                                    {recipe_4_upcoming.length > 0 ? <h2>{recipe_4_upcoming[0]["recipe-name"]}</h2> : <h2>Not in Use</h2>}
+                                    {/* {(recipe_4_timer > 0) ? <h5>Waiting for cooking to finish in {recipe_4_timer} secs...</h5> : null} */}
+                                    {(recipe_4_timer > 0) ? <h5>Waiting for step to finish cooking in {(recipe_4_timer / (60*60)) >= 1 ? (Math.floor(recipe_4_timer/(60*60))) : ('00')}:{(59 >= (recipe_4_timer / 60) && (recipe_4_timer / 60)  >= 1) ? (Math.floor(recipe_4_timer / 60)) : '00'}:{ (59 >= (recipe_4_timer%60)) ? (recipe_4_timer%60) : '00'}</h5> : null}
+
+                                    <img style={{"width": window.innerWidth * 0.2 * (window.innerHeight / window.innerWidth), "height": window.innerHeight * 0.2 }} src={Black_Circle} alt="black stove" />
+                                </Col>
+
+                            </Row>
+
+                        </Container>                                
+
+                    </Row>
+
+                </Row>
+
+
+
+            </Container>
+            
+        );
+    }
+
+    
+
+    
     
 }
 

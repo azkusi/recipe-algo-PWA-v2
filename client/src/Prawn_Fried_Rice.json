@@ -1,65 +1,72 @@
 {
     "recipe-number": 2,
     "name": "Prawn Fried Rice", 
-    "base-steps":[],
+    "base-steps":[
+        {"instruction":"Boil rice in rice cooker",
+        "step-number": "B1",
+        "duration": 25,
+        "imperative-claasification": "NON_IMPERATIVE",
+        "step-dependency": []
+        }
+    ],
     "retrieval-steps":[
         {"instruction": "Retrieve pack of frozen peas",
-        "step-number": 1,
+        "step-number": "R1",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve pack of mangetout",
-        "step-number": 2,
+        "step-number": "R2",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve rapeseed oil",
-        "step-number": 3,
+        "step-number": "R3",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 onion",
-        "step-number": 4,
+        "step-number": "R4",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 garlic",
-        "step-number": 5,
+        "step-number": "R5",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 1 piece of ginger",
-        "step-number": 6,
+        "step-number": "R6",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve pack of king prawns",
-        "step-number": 7,
+        "step-number": "R7",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 3 eggs",
-        "step-number": 8,
+        "step-number": "R8",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve pack of sesame seeds",
-        "step-number": 9,
+        "step-number": "R9",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve soy sauce",
-        "step-number": 10,
+        "step-number": "R10",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve white wine vinegar",
-        "step-number": 11,
+        "step-number": "R11",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Retrieve 4 spring onions",
-        "step-number": 12,
+        "step-number": "R12",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         }
@@ -67,42 +74,42 @@
 
     "prep-steps":[
         {"instruction": "Boil 100g mangetout and 150g peas for 60 seconds and then drain and place in a small bowl",
-        "step-number": 1,
+        "step-number": "P1",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Finely slice 1 onion into small pieces",
-        "step-number": 2,
+        "step-number": "P2",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Crush 2 garlic cloves",
-        "step-number": 3,
+        "step-number": "P3",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Finely grate a thumb-sized piece of ginger",
-        "step-number": 4,
+        "step-number": "P4",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Beat 3 eggs into a bowl",
-        "step-number": 5,
+        "step-number": "P5",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Finely slice 4 spring onions",
-        "step-number": 6,
+        "step-number": "P6",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Transfer all chopped ingredients to one plate keeping each ingredient separate",
-        "step-number": 7,
+        "step-number": "P7",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         },
         {"instruction": "Together, place the plate and the small bowl used for this recipe aside for now",
-        "step-number": 8,
+        "step-number": "P8",
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": []            
         }
@@ -111,83 +118,77 @@
     "oven-steps":[],
 
     "stove-steps":[
-        {"instruction":"Boil rice in rice cooker",
-        "step-number": 1,
-        "duration": 25,
-        "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": []
-        },
         {"instruction": "Heat the rapeseed oil in a pan/wok over a medium heat for 2 mins",
-        "step-number": 2,
+        "step-number": "S1",
         "imperative-claasification": "NON_IMPERATIVE",
         "duration": 2,
         "step-dependency": []            
         },
         {"instruction": "Fry the onion pieces for 10 mins",
-        "step-number": 3,
+        "step-number": "S2",
         "duration": 10,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2]            
+        "step-dependency": ["S1"]            
         },
         {"instruction": "Add the garlic and ginger pieces and fry for a further minute",
-        "step-number": 4,
+        "step-number": "S3",
         "duration": 1,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2, 3]            
+        "step-dependency": ["S2"]            
         },
         {"instruction": "Add the mangetout and the peas to cook for 5 mins",
-        "step-number": 5,
+        "step-number": "S4",
         "duration": 5,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2, 3, 4]            
+        "step-dependency": ["S3"]            
         },
         {"instruction": "Add 150g of prawns to fry for 2 mins",
-        "step-number": 6,
+        "step-number": "S5",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2, 3, 4, 5]            
+        "step-dependency": ["S4"]            
         },
         {"instruction": "Reduce the heat to low",
-        "step-number": 7,
-        "duration": 0,
+        "step-number": "S6",
+        "duration": 0.1,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [2, 3, 4, 5, 6]
+        "step-dependency": ["S5"]
         },
         {"instruction": "Stir the rice into the pan and place on medium heat for 2 mins",
-        "step-number": 8,
+        "step-number": "S7",
         "duration": 2,
         "imperative-claasification": "NON_IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7]
+        "step-dependency": ["B1", "S6"]
         },
         {"instruction": "Push everything to one half of the pan/wok and pour the beaten eggs into the other half of the wok - leave for 1 minute",
-        "step-number": 9,
+        "step-number": "S8",
         "duration": 1,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8]
+        "step-dependency": ["S7"]
         },
         {"instruction": "Scramble the eggs and keep frying for 2 more minutes",
-        "step-number": 10,
+        "step-number": "S9",
         "duration": 2,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        "step-dependency": ["S8"]
         },
         {"instruction": "Mix the eggs in with the rice",
-        "step-number": 11,
-        "duration": 0,
-        "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        },
-        {"instruction": "Turn off the hob",
-        "step-number": 12,
+        "step-number": "S10",
         "duration": 0.1,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        "step-dependency": ["S9"]
+        },
+        {"instruction": "Turn off the hob",
+        "step-number": "S11",
+        "duration": 0.1,
+        "imperative-claasification": "IMPERATIVE",
+        "step-dependency": ["S10"]
         },
         {"instruction": "Ready to serve",
-        "step-number": 13,
-        "duration": 0,
+        "step-number": "S12",
+        "duration": 0.1,
         "imperative-claasification": "IMPERATIVE",
-        "step-dependency": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        "step-dependency": ["S11"]
         }
     ]
 }
