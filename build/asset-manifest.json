@@ -1,21 +1,25 @@
 {
   "files": {
     "main.css": "/static/css/main.49a99497.css",
-    "main.js": "/static/js/main.80dad820.js",
+    "main.js": "/static/js/main.e2c7f1dc.js",
     "static/js/787.c3d17fa1.chunk.js": "/static/js/787.c3d17fa1.chunk.js",
     "static/media/chopping_board1.jpeg": "/static/media/chopping_board1.21107a18c4a9889871a3.jpeg",
     "static/media/chopping_board3.jpeg": "/static/media/chopping_board3.31fc193ddeb1e6186456.jpeg",
     "static/media/chopping_board2.jpeg": "/static/media/chopping_board2.cbaeaa78e488a2b6735f.jpeg",
+    "static/media/wok_pan.jpeg": "/static/media/wok_pan.3897ddee72a1331f6708.jpeg",
+    "static/media/small_item_organiser.jpeg": "/static/media/small_item_organiser.119b2dfb4110e10ad69d.jpeg",
+    "static/media/plate.jpeg": "/static/media/plate.e05d08c7bb59d45c3a95.jpeg",
+    "static/media/induction_hob.jpeg": "/static/media/induction_hob.554d6b78012f85ce9785.jpeg",
     "service-worker.js": "/service-worker.js",
     "static/media/NewNotification.mp3": "/static/media/NewNotification.d2345dad38de196bf139.mp3",
     "static/media/Black_Circle.jpeg": "/static/media/Black_Circle.d90d1f69e27b26a272b3.jpeg",
     "index.html": "/index.html",
     "main.49a99497.css.map": "/static/css/main.49a99497.css.map",
-    "main.80dad820.js.map": "/static/js/main.80dad820.js.map",
+    "main.e2c7f1dc.js.map": "/static/js/main.e2c7f1dc.js.map",
     "787.c3d17fa1.chunk.js.map": "/static/js/787.c3d17fa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.49a99497.css",
-    "static/js/main.80dad820.js"
+    "static/js/main.e2c7f1dc.js"
   ]
 }

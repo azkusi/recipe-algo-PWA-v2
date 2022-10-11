@@ -2,7 +2,7 @@
     "recipe-number": 3,
     "name": "Chicken Curry", 
     "base-steps":[
-        {"instruction":"Boil rice in rice cooker",
+        {"instruction":"Boil 250g of rice in rice cooker",
         "step-number": "B1",
         "duration": 25,
         "imperative-claasification": "NON_IMPERATIVE",
@@ -108,37 +108,37 @@
     "oven-steps":[],
 
     "stove-steps":[
-        {"instruction": "Heat the sunflower oil in a large frying pan over a medium heat for 2 mins",
+        {"instruction": "Heat the sunflower oil in a large frying pan over a MEDIUM heat for 2 mins",
         "step-number": "S1",
         "imperative-claasification": "NON_IMPERATIVE",
         "duration": 2,
         "step-dependency": []            
         },
-        {"instruction": "Add the onion pieces and a generous pinch of salt and fry for 8 mins",
+        {"instruction": "Add the onion pieces and a generous pinch of salt and fry for 8 mins on MEDIUM heat",
         "step-number": "S2",
         "duration": 8,
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": ["S1"]            
         },
-        {"instruction": "Add the garlic and ginger pieces, leave to cook for a further minute",
+        {"instruction": "Add the garlic and ginger pieces, leave to cook for a further minute on MEDIUM heat",
         "step-number": "S3",
         "duration": 1,
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": ["S2"]            
         },
-        {"instruction": "Add the chicken pieces to the pan and fry for 5 mins",
+        {"instruction": "Add the chicken pieces to the pan and fry for 5 mins on MEDIUM heat",
         "step-number": "S4",
         "duration": 5,
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": ["S3"]            
         },
-        {"instruction": "Mix in a can of 400g tomatoes, 3 table-spoons of tikka curry paste, and 250ml of water, leave to cook on low-medium heat for 30 mins",
+        {"instruction": "Mix in a can of 400g tomatoes, 3 table-spoons of tikka curry paste, and 250ml of water, leave to cook on LOW-MEDIUM heat for 30 mins",
         "step-number": "S5",
         "duration": 30,
         "imperative-claasification": "NON_IMPERATIVE",
         "step-dependency": ["S4"]            
         },
-        {"instruction": "Mix in 100g greek yogurt, the coriander pieces, and 50g ground almonds and discretionary seasoning - leave to cook for 5 mins on low heat",
+        {"instruction": "Mix in 100g greek yogurt, the coriander pieces, and 50g ground almonds and discretionary seasoning - leave to cook for 5 mins on LOW heat",
         "step-number": "S6",
         "duration": 5,
         "imperative-claasification": "NON_IMPERATIVE",

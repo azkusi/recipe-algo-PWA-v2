@@ -11,6 +11,9 @@ import {Route, Routes, BrowserRouter, Link} from 'react-router-dom';
 import Landing from './pages/landing';
 import Demo from './pages/demo';
 import ChefAlgo from './pages/chefAlgo';
+import ChefTestimonials from './pages/ChefTestimonials';
+import HowItWorks from './pages/HowItWorks';
+
 import { useEffect } from 'react';
 
 function App() {
@@ -31,6 +34,8 @@ function App() {
           <Route path="/" element={<Landing/>} />
           <Route path='/demo' element={<Demo/>}/>
           <Route path='/actual' element={<ChefAlgo/>}/>
+          <Route path='/how-it-works' element={<HowItWorks/>}/>
+          <Route path='/chef-testimonials' element={<ChefTestimonials/>}/>
         </Routes>
       </BrowserRouter>
       

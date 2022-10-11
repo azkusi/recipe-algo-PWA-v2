@@ -3,6 +3,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Toast from 'react-bootstrap/Toast';
+import Carousel from 'react-bootstrap/Carousel';
 
 
 
@@ -12,6 +13,10 @@ import Black_Circle from '../images/Black_Circle.jpeg'
 import chopping_board1 from '../images/chopping_board1.jpeg'
 import chopping_board2 from '../images/chopping_board2.jpeg'
 import chopping_board3 from '../images/chopping_board3.jpeg'
+import induction_hob from '../images/induction_hob.jpeg';
+import plate from '../images/plate.jpeg';
+import small_item_organiser from '../images/small_item_organiser.jpeg';
+import wok_pan from '../images/wok_pan.jpeg';
 
 
 import NewNotification from '../sounds/NewNotification.mp3';
@@ -983,7 +988,7 @@ function ChefAlgo() {
                 <Row>
                     <Col>
                         <Container>
-                        <h5>
+                            <h5>
                                 This model is built on the premise that ALL the ingredients
                                 required for ALL of the meals that will be cooked, will already be chopped/grated/sliced/prepared
                                 and stored in labelled small storage cases, stored in large walk-in fridges
@@ -1048,25 +1053,54 @@ function ChefAlgo() {
                 <br/>
 
                 <h5>You will need: </h5>
-                <Container>
-                    <Card>
-                        Small item organiser / 4 large plates (i)
-                    </Card>
-                    <br/>
-                    <Card>
-                        2 Woks/Frying Pans
-                    </Card>
-                    <br/>
-                    <Card>
-                       2 Pots 
-                    </Card>
-                    <br/>
-                    <Card>
-                        4 induction hobs
-                    </Card>
-                    
-                    
-                </Container>
+                <Carousel variant="dark" style={{"height": window.innerHeight * 0.6, "width": window.innerWidth * 0.7, "margin": "0 auto"}}>
+                    <Carousel.Item>
+                        <img style={{"opacity": "0.5"}}
+                            src={induction_hob}
+                            alt="induction_hob"
+                        />
+                        <Carousel.Caption>
+                        <h3>4 induction hobs</h3>
+                        <p>(stove hobs/portable hobs)</p>
+                        </Carousel.Caption>
+                    </Carousel.Item>
+
+                    <Carousel.Item>
+                        <img style={{"opacity": "0.5"}}
+                            src={wok_pan}
+                            alt="wok_pan"
+                        />
+                        <Carousel.Caption>
+                        <h3>2 woks / frying pans</h3>
+                        
+                        </Carousel.Caption>
+                    </Carousel.Item>
+
+                    <Carousel.Item>
+                        <img style={{"opacity": "0.5"}}
+                            src={small_item_organiser}
+                            alt="small_item_organiser"
+                        />
+                        <Carousel.Caption>
+                        <h3>Small item organiser</h3>
+                        <p>(To store and separate ingredients for easy retrieval)</p>
+                        </Carousel.Caption>
+                    </Carousel.Item>
+
+                    <Carousel.Item>
+                        <img style={{"opacity": "0.5"}}
+                            src={plate}
+                            alt="plate"
+                        />
+                        <Carousel.Caption>
+                        <h3>4 plates</h3>
+                        <p>(Only needed if you don't have a small item oraniser)</p>
+                        <p>(Each plate will be used to store one recipe's ingredients)</p>
+                        <p>(Each ingredient will need to be kept on a separate section of the plate for easy retrieval)</p>
+                        </Carousel.Caption>
+                    </Carousel.Item>
+  
+                </Carousel>
                 <br/>
                 
                 <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
@@ -1306,8 +1340,8 @@ function ChefAlgo() {
                 //===========================================================
                 <Container>
                     <h1 style={{"color": "#FF9F33"}}>Actual</h1>
-                    <Button variant='info' onClick={()=>{set_pop_over(!pop_over)}} aria-label="info">
-                        Orientation Info
+                    <Button variant='outlined' onClick={()=>{set_pop_over(!pop_over)}} aria-label="info">
+                        Click for Orientation Info
                     </Button>
                     <Toast show={pop_over} onClose={()=>{set_pop_over(false)}}>
                         <Toast.Header>Orientation Help</Toast.Header>
