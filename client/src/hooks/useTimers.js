@@ -4,50 +4,53 @@ import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import 'firebase/compat/firestore';
 
-
+import { db } from '../config';
 
 import {useEffect, useState } from 'react';
-import { config } from '../config';
 
-let db;
-firebase.initializeApp(config);
-db = firebase.firestore()
+
 
 
   //get updated to_do steps after every change
-const useTimers = (duration) => {
-        const [time_left, set_time_left] = useState(duration)
+//==============================================================================
+// ANY TIME THERE IS A CHANGE/ADDITION/REMOVAL FROM THE TO-DO-STEPS COLLECTION
+// SEND THAT DATA (I.E THE NEW REMAINING TO DO STEPS) TO THE ALGO
+//==============================================================================
+const useTimers = (cooking_sess_instance) => {
 
-    
+        const[timers, set_timers] = useState(null)
+      
         useEffect(()=>{
-           
-            let myInterval = setInterval(() => {
-                if (time_left > 0) {
-                    set_time_left(time_left - 1);
-                }
-                if (time_left === 0) {
+            console.log("cooking_sess_instance: ", cooking_sess_instance)
+            if(cooking_sess_instance){
+                // console.log("instance is: ", toDoStepsFBInstance)
+                const unsub =  db.collection("timers").doc(cooking_sess_instance)
+                // .orderBy('timestamp', 'desc')
+                .onSnapshot(async (doc)=>{
+                    console.log("timer info at fb: ", doc.data())
+                    set_timers(doc.data())
                     
-                    clearInterval(myInterval)
-                } 
-            }, 1000)
-            return ()=> {
-                clearInterval(myInterval);
-                };
-        //})                    
+                }, (error)=>{
+                    console.log("document id passed, likely not defined")
+                    console.log("error", error)
+                })
                         
-                //     resolve({"recipe-name": snapshot.data()["recipe-name"], "time_left": time_left});
-                // })
-        // })
-                    
-            // return () => unsub();
-        }, [time_left])
+                return () => unsub();
+            }
+            
+            
+        }, [cooking_sess_instance])
     
     
     
     
       
     
-      return time_left
+      return {timers}
     }
 
 export default useTimers;
+
+
+
+
