@@ -1822,7 +1822,7 @@ useEffect(()=>{
                                     
                             
                             :
-                            <h4>Mix all meals whilst waiting for next step</h4>
+                            <h4>Waiting for steps to load...</h4>
                         
                             }
                         </Col>
