@@ -870,8 +870,8 @@ useEffect(()=>{
     //=====================================================
     //       EACH TIME A TIMER OF A RECIPE STEP FINISHES
     //  THIS FUNCTION IS RUN TO REMOVE THE COMPLETED STEP 
-    // FROM [DEPENDENCY ARRAY] I.E REMOVE THE STEP FROM BEING
-    // THAT OTHER STEPS ARE DEPENDENT ON
+    // FROM ALL [DEPENDENCY ARRAYS] I.E REMOVE THE STEP FROM BEING
+    // ONE THAT OTHER STEPS ARE DEPENDENT ON
     //=====================================================
     //any time timer finishes, run this and change dependencies
     function background(step, duration, upcoming_recipe_FBID){
@@ -1392,7 +1392,7 @@ useEffect(()=>{
                                         
                                         set_instruction_stage(instruction_stage + 1)
                                         //temp_completed.unshift(on_screen_instruction)
-                                        set_completed_steps(completed_steps => [{"stage": stage, "instruction": on_screen_instruction}, ...completed_steps])
+                                        set_completed_steps(completed_steps => [{"stage": stage, "instruction": on_screen_instruction, "recipe-name": recipes[recipe_cycle_number_copy]["name"]}, ...completed_steps])
                                         setNextClick(true)
                                     }
                                 
@@ -1419,9 +1419,10 @@ useEffect(()=>{
                     
                                 {(consecutive_back_presses >= 0 && completed_steps.length > 0) &&    
                                     <div>
-                                        <h3>Previous Instruction:</h3>
-                                        <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
-                                        <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>
+                                        <h3 style={{"color": "red"}}>Previous Instruction:</h3>
+                                        <h3 style={{"color": "red"}}>Recipe: {completed_steps[consecutive_back_presses]["recipe-name"]}</h3>
+                                        <h3 style={{"color": "red"}}>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
+                                        <h3 style={{"color": "red"}}>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>
                                     </div>
 
                                     
@@ -1455,11 +1456,12 @@ useEffect(()=>{
                     </Container>
                 </Row>
 
-                <Row>
+                {/* <Row>
                     
                     {(consecutive_back_presses >= 0 && completed_steps.length > 0) &&    
                         <div>
                             <h3>Previous Instruction:</h3>
+                            <h3>Recipe: {completed_steps[consecutive_back_presses]["recipe-name"]}</h3>
                             <h3>Stage: {completed_steps[consecutive_back_presses]["stage"]}</h3>
                             <h3>Instruction: {completed_steps[consecutive_back_presses]["instruction"]}</h3>
                         </div>
@@ -1475,7 +1477,7 @@ useEffect(()=>{
                         // )
                         
                     }
-                </Row>
+                </Row> */}
     
             </div>
                 
@@ -1587,7 +1589,7 @@ useEffect(()=>{
                                             console.log("NEXT BUTTON PRESSED")
                                             console.log("======================================")
                                             //temp_completed.unshift(on_screen_instruction)
-                                            set_completed_steps(completed_steps => [{"stage": stage, "instruction": to_do_steps["steps"][0]}, ...completed_steps])
+                                            set_completed_steps(completed_steps => [{"stage": stage, "instruction": to_do_steps["steps"][0], "recipe-name": to_do_steps["steps"][0]["recipe-name"]}, ...completed_steps])
                                             if(to_do_steps["steps"].length > 0){
 
                                                 
