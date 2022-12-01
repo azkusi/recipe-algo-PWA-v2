@@ -1277,7 +1277,7 @@ useEffect(()=>{
                             alt="wok_pan"
                         />
                         <Carousel.Caption>
-                        <h3>2 woks / frying pans</h3>
+                        <h3>12 woks / frying pans</h3>
                         
                         </Carousel.Caption>
                     </Carousel.Item>

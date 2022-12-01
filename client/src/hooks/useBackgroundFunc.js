@@ -43,14 +43,53 @@ const useBackgroundFunc = (toDoStepsFBInstance, num_recipes) => {
                 // .orderBy('timestamp', 'desc')
                 .onSnapshot(async (doc)=>{
                     if(doc.id === toDoStepsFBInstance){
-                        let to_do_steps = [];
+                        let prioritised_steps = [];
+                        let to_do_steps = doc.data()
                         return new Promise ((resolve, reject)=>{
                             //let docID = snapshot.id
-                            setToDos(doc.data())
+                            //setToDos(doc.data())
+                            
                             console.log("got to usebckgrnd set")
                             if("steps" in doc.data() && num_recipes){
-                                to_do_steps = doc.data()
+
                                 if(doc.data()["steps"].length > 0){
+                                    //order the to_do_steps by placing IMPERATIVES at second position of the array array[1]
+                                    //if the second position is an imperative, traverse the array till you find a
+                                    //position not occupied by an imperative and place there
+                                    //imperatives not put into first position in array (array[0]), because
+                                    //that would constantly change the on screen instruction even when the user is yet
+                                    //to complete the step
+                                    let i = 0;
+                                    for(i; i < doc.data()["steps"].length; i++){
+                                        if(doc.data()["steps"][i]["step-info"]["imperative-classification"] === "IMPERATIVE"){
+                                            if(prioritised_steps.length > 1){
+                                                let j = 1;
+                                                for(j; j < prioritised_steps.length ;j++){
+                                                    if(prioritised_steps[j]["step-info"]["imperative-classification"] !== "IMPERATIVE"){
+                                                        prioritised_steps.splice(j, 0, doc.data()["steps"][i])
+                                                        break
+                                                    }else{
+                                                        continue
+                                                    }
+                                                    
+                                                }
+                                            }else{
+                                                prioritised_steps.push(doc.data()["steps"][i])
+                                            }
+                                            
+                                        }else{
+                                            console.log("prioritisation occurred")
+                                            prioritised_steps.push(doc.data()["steps"][i])
+                                        }
+                                        if(i === doc.data()["steps"].length - 1){
+                                            console.log("prioritisation 2 occurred")
+                                            to_do_steps["steps"] = prioritised_steps
+                                        }
+                                    }
+                                    
+                                    // if(i === doc.data()["steps"].length){
+                                    //     setToDos(to_do_steps)
+                                    // }
 
                                     if(doc.data()["steps"][0]["hob-number"] === 1){
                                         set_background_colour_1("#ff5440")
@@ -148,10 +187,12 @@ const useBackgroundFunc = (toDoStepsFBInstance, num_recipes) => {
                                             set_background_colour_12("transparent")
                                         }
                                     } 
+                                    setToDos(to_do_steps)
                                 }
                                 
                                 
                             }
+                            setToDos(to_do_steps)
                                     
                             resolve({
                                 "to_do_steps": to_do_steps, 
