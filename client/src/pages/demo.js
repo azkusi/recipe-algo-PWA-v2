@@ -160,6 +160,8 @@ function Demo() {
     const [square_layout, set_square_layout] = useState(true)
     const [pop_over, set_pop_over] = useState(false)
 
+    const [prep_cook_modal, set_prep_cook_modal] = useState(false)
+    const [prep_cook_choice, set_prep_cook_choice] = useState("Cooking Meals")
 
 
     useEffect(()=>{
@@ -849,10 +851,11 @@ useEffect(()=>{
                 
             }
             if(i === Object.keys(recipes).length + 1){
-                set_background_update(background_update + 1)
-                // set_current_instruction_object(null)
-                setStage("BASE")
-                resolve()
+                // set_last_instruction_in_stage(true)
+                    // setStage("BASE")
+                    // set_background_update(background_update + 1)
+                    resolve()
+                
             }
         })
 
@@ -980,11 +983,20 @@ useEffect(()=>{
         console.log("running stage complete")
 
         if(stage === "LOAD"){
-            console.log("setting stage to base")
-            setStage('BASE')
-            set_last_instruction_in_stage(false)
-            set_instruction_stage(1)
-            set_recipe_cycle_number(1)
+            if(prep_cook_choice === "Cooking Meals"){
+                console.log("setting stage to base")
+                setStage('BASE')
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }else{
+                setStage("RETRIEVAL")
+                console.log("setting stage to base")
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }
+            
         }else if(stage === 'BASE'){
             console.log("setting stage to pre-heat")
             setStage('PRE-HEAT')
@@ -993,8 +1005,8 @@ useEffect(()=>{
             set_recipe_cycle_number(1)
         }
         else if(stage === 'PRE-HEAT'){
-            console.log("setting stage to retrieval")
-            setStage('RETRIEVAL')
+            console.log("setting stage to oven")
+            setStage('OVEN')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
@@ -1009,7 +1021,7 @@ useEffect(()=>{
         else if(stage === 'PREP'){
             // setStage('QUEUE_NEXT_STEP')
             console.log("setting stage to oven")
-            setStage('OVEN')
+            setStage('PREP_DONE')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
@@ -1165,7 +1177,7 @@ useEffect(()=>{
                         
                         <Modal.Body>
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
-                            <InputLabel id="demo-simple-select-label">Recipes</InputLabel>
+                                <InputLabel id="demo-simple-select-label">Recipes</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
@@ -1217,16 +1229,62 @@ useEffect(()=>{
 
                 <br/>
                 <br/>
+                <Modal
+                    show={prep_cook_modal} 
+                    onHide={()=>{set_prep_cook_modal(false)}}
+                    size="lg"
+                    style={{"maxHeight": "80vh"}}
+                    scrollable={true}
+                >
+                    <Modal.Header>
+                        <Modal.Title>
+                            Will you be prepping or cooking the meals?
+                        </Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        <FormControl sx={{ m: 1, minWidth: 120 }}>
+                        <FormLabel id="select-cook-prep">Select</FormLabel>
+                            <RadioGroup
+                                aria-labelledby="select-cook-prep"
+                                defaultValue="Cooking Meals"
+                                name="radio-buttons-group"
+                                onChange={(e)=>{set_prep_cook_choice(e.target.value)}}
+
+                            >
+                                <FormControlLabel value="Cooking Meals" control={<Radio />} label="Cooking Meals" />
+                                <FormControlLabel value="Prepping Ingredients" control={<Radio />} label="Prepping Ingredients" />
+                            </RadioGroup>
+                        </FormControl>
+
+                        
+                        
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant='contained' onClick={()=>{
+                                setStage('REQUIREMENTS')
+                                set_app_starting(true)
+                                set_receipe_total(selected_recipes.length)
+                                set_prep_cook_modal(false)
+                                
+                                
+
+                            }}>Begin</Button>
+                    </Modal.Footer>
+                </Modal>
 
                 <Row>
                     <Col>
                         { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
                             if(recipes_selected){
-                                setStage('REQUIREMENTS')
-                                set_app_starting(true)
-                                set_receipe_total(selected_recipes.length)
-                                // set_instruction_stage(instruction_stage + 1)
-                                // set_recipe_cycle_number(recipe_cycle_number + 1) 
+                                set_prep_cook_modal(true)
+                                // setStage('REQUIREMENTS')
+                                // set_app_starting(true)
+                                // set_receipe_total(selected_recipes.length)
+                                
+                                
+
+
                             }else{
                                 window.alert("Please select a recipe before starting")
                             }
@@ -1258,7 +1316,7 @@ useEffect(()=>{
 
                 <br/>
 
-                <h5>You will need: </h5>
+                <h5>You may need: </h5>
                 <Carousel variant="dark" style={{"height": window.innerHeight * 0.6, "width": window.innerWidth * 0.7, "margin": "0 auto"}}>
                     <Carousel.Item>
                         <img style={{"opacity": "0.5"}}
@@ -1485,6 +1543,17 @@ useEffect(()=>{
 
     }
 
+    else if(stage === "PREP_DONE"){
+        return(
+            <div>
+                <h1>
+                    Please place all ingredients inside the small item organiser
+                    and place the small item organiser in the (walk-in) fridge
+                </h1>
+            </div>
+        )
+    }
+
 
     else if(stage === "PRE-HEAT"){
         return(
@@ -1518,7 +1587,9 @@ useEffect(()=>{
 
                         <Col>
                             <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                                setStage("RETRIEVAL")
+                                // setStage("RETRIEVAL")
+                                set_last_instruction_in_stage(true)
+                                set_background_update(background_update + 1)
                                 
                                 // set_instruction_stage(instruction_stage + 1)
                                 // set_recipe_cycle_number(1)
