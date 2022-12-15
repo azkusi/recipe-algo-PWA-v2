@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import Button from '@mui/material/Button';
 import FormGroup from '@mui/material/FormGroup';
 import FormControl from '@mui/material/FormControl';
@@ -31,10 +32,11 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
-import Toast from 'react-bootstrap/Toast';
+// import Toast from 'react-bootstrap/Toast';
 import Carousel from 'react-bootstrap/Carousel';
 import Modal from 'react-bootstrap/Modal';
 
+import Papa from 'papaparse'
 
 
 
@@ -55,7 +57,9 @@ import useBackgroundFunc from '../hooks/useBackgroundFunc';
 import useFetchRecipes from '../hooks/useFetchRecipes';
 import useTimers from '../hooks/useTimers';
 import useFetchFinishedRecipes from '../hooks/useFetchFinishedRecipes';
-
+import useFetchCustomerOrders from '../hooks/useFetchCustomerOrders';
+import useFetchCustomerOrdersSpecific from '../hooks/useFetchCustomerOrdersSpecific';
+import { Alert } from '@mui/material';
 
 
 function ChefAlgo() {
@@ -160,6 +164,34 @@ function ChefAlgo() {
     const [square_layout, set_square_layout] = useState(true)
     const [pop_over, set_pop_over] = useState(false)
 
+    const [show_customer_orders_modal, set_show_customer_orders_modal] = useState(false)
+
+    const customer_orders = useFetchCustomerOrders().orders
+    const [customer_order_data, set_customer_order_data] = useState(null)
+
+    const[csv_data, set_csv_data] = useState(null)
+
+    const [chosen_order_data, set_chosen_order_data] = useState(null)
+    const [chosen_order_id, set_chosen_order_id] = useState(null)
+    const [chosen_activity, set_chosen_activity] = useState(null)
+    const [num_hobs_chosen, set_num_hobs_chosen] = useState(null)
+    const [meals_on_hob, set_meals_on_hob] = useState(null)
+    const [cooking_complete_alert, set_cooking_complete_alert] = useState(false)
+    const [finished_cooking_modal, set_finished_cooking_modal] = useState(true)
+
+    const [meals_to_prep, set_meals_to_prep] = useState(null)
+    const [prep_modal, set_prep_modal] = useState(false)
+    const [retrieval_steps, set_retrieval_steps] = useState(null)
+    const [prep_steps, set_prep_steps] = useState(null)
+
+    const [step_counter, set_step_counter] = useState(0)
+    const [prep_stage, set_prep_stage] = useState(null)
+    const [retrieval_stage, set_retrieval_stage] = useState(null)
+    const [packing_object, set_packing_object] = useState(null)
+    const [chosen_order_view, set_chosen_order_view] = useState("BY_NAME")
+    const [cust_all_orders_obj_by_name, set_cust_all_orders_obj_by_name] = useState(null)
+    const [cust_all_orders_obj_by_meal, set_cust_all_orders_obj_by_meal] = useState(null)
+    const [deleted_cust_orders, set_deleted_cust_orders] = useState(false)
 
 
     useEffect(()=>{
@@ -606,88 +638,208 @@ useEffect(()=>{
     //       RETRIEVES THEIR IDs FOR ALGORITHM TO RUN
     //=====================================================
     function loadAlgo(){
+        console.log("Chosen customer orders: ", chosen_order_data)
         let to_do_steps_instance_FBID;
         if(!loadAlgo_check){
 
             setLoadAlgo_check(true)
             return new Promise(async (resolve, reject)=>{
-                let recipe1;
-                let recipe2;
-                let recipe3;
-                let recipe4;
+                //set recipes
+                let k = 0
+                let i = 1
+                const cust_emails =  Object.keys(chosen_order_data["customer_order_data"]).sort()
+                let recipes_copy = {}
+                let meals_on_hob_copy = []
+                console.log("cust orders: ", cust_emails)
 
-                
-                let upcoming_recipe_1_FBID;
-                let upcoming_recipe_2_FBID;
-                let upcoming_recipe_3_FBID;
-                let upcoming_recipe_4_FBID;
-
-                
                 db.collection("to-do-steps").add({"steps": [], "finished": []})
                 .then(async (docRef) => {
                     console.log("Document written with ID: ", docRef.id);
 
                     to_do_steps_instance_FBID = docRef.id
                     set_to_do_steps_instance_FBID(docRef.id)
-                    await db.collection('timers').add({"dummy": "ignore"})
-                    .then((documentRef)=>{
-                        set_cooking_sess_instance(documentRef.id)
-                    })
-                })
-                .then(async ()=>{
-                    let i = 0;
-                    let upcoming_recipes_copy = upcoming_recipes_FBIDs_dictionary
-                    for(i; i < selected_recipes.length; i++){
-                        //add a new document to FB where each recipe's upcoming(remaining) steps will be saved and changed and retrieved
-                        await db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
-                            // eslint-disable-next-line no-loop-func
-                            .then((docRef) => {
-                                console.log("Document written with ID: ", docRef.id);
-                                
-                                upcoming_recipes_copy[i+1] = docRef.id;
-                                set_upcoming_recipes_FBIDs_dictionary(upcoming_recipes_copy);
-                                set_upcoming_recipes_FBIDs_array(upcoming_recipes_FBIDs =>[...upcoming_recipes_FBIDs, docRef.id])
-
-                            // eslint-disable-next-line no-loop-func
-                            }).then(()=>{
-                                db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
-                                .update(upcoming_recipes_copy)
-                            })
-                    }
-                }).then(async ()=>{
-                    return new Promise(async (resolve, reject)=>{
-                        let j = 1;
-                        let recipes_copy = recipes
-                        console.log("j top now:", j.toString())
-                        console.log("selected_recipes.length: ", selected_recipes.length.toString())
-                        for(j; j <= selected_recipes.length; j++){
-                            //db.collection("recipes_test").doc(selected_recipes[j].number.toString()).get().where(name === selected_recipes[j])
-                            // eslint-disable-next-line no-loop-func
-                            console.log("j inside 1 is now:", j.toString())
-
-                            // eslint-disable-next-line no-loop-func
-                            await db.collection("recipes").doc(selected_recipes[j - 1].number.toString()).get().then((snapshot)=>{
-                                recipes_copy[j] = snapshot.data()
-                                console.log("recipes copy: ", recipes_copy)
-                                set_recipes(recipes_copy)
-                            }).then(()=>{
-                                
-                            })
-                            console.log("j inside 2 is now:", j.toString())
-                            
-                        }
-                        console.log("got to out of for loop ", j.toString())
-                        if(j > selected_recipes.length){
-                            console.log("resolving the load func")
-                            set_last_instruction_in_stage(true)
-                            resolve()
-                        }
-                    })
-                    
                 }).then(()=>{
-                    stovePreliminary(to_do_steps_instance_FBID).then(()=>{
-                        resolve()
-                    })
+                    db.collection("recipes").get()
+                    .then((querySnapshot)=>{
+                        for(k; k < cust_emails.length; k++){
+                            let j = 0;
+                            if(chosen_activity === "COOKING"){
+                                if(Object.keys(recipes_copy).length === num_hobs_chosen){
+                                    break
+                                }
+                            }
+                            console.log("k is :, ", k)
+                            console.log("cust emails is: ", cust_emails)
+                            console.log(chosen_order_data["customer_order_data"][cust_emails[k]])
+                            for(j; j < chosen_order_data["customer_order_data"][cust_emails[k]]["Selected_Meals"].length; j++){
+                                if(chosen_activity === "COOKING"){
+                                    if(Object.keys(recipes_copy).length === num_hobs_chosen){
+                                        break
+                                    }
+                                }
+                                
+                                // eslint-disable-next-line no-loop-func
+                                querySnapshot.forEach((doc)=>{
+                                    if(doc.data()["name"] === chosen_order_data["customer_order_data"][cust_emails[k]]["Selected_Meals"][j]["Name"]){
+                                        recipes_copy[i] = doc.data()
+                                        meals_on_hob_copy.push({
+                                            "Email": cust_emails[k],
+                                            "Meal_Name": chosen_order_data["customer_order_data"][cust_emails[k]]["Selected_Meals"][j]["Name"],
+                                            
+                                        })
+                                        i++;
+                                    }
+                                })
+                                    
+                                
+                                
+                            }
+                            // temp_orders[results.data[i]["Email"]] = {
+                            //     "Selected_Meals": [],
+                            //     "Shipping_Name": results.data[i]["Shipping Name"] ,
+                            //     "Shipping_Street": results.data[i]["Shipping Street"],	
+                            //     "Shipping_Address1": results.data[i]["Shipping Address1"],	
+                            //     "Shipping_Address2": results.data[i]["Shipping Address2"],	
+                            //     "Shipping_City": results.data[i]["Shipping City"],	
+                            //     "Shipping_Zip": results.data[i]["Shipping Zip"]
+                            // }
+                        }                       
+                        
+                    }).then(()=>{
+                        console.log("recipes_copy to set recipes: ", recipes_copy)
+                        set_recipes(recipes_copy)
+                        set_meals_on_hob(meals_on_hob_copy)
+                        
+                    }).then(()=>{
+                        if(chosen_activity === "COOKING"){
+                            db.collection("to-do-steps").add({"steps": [], "finished": []})
+                            .then(async ()=>{
+                                let i = 0;
+                                let upcoming_recipes_copy = upcoming_recipes_FBIDs_dictionary
+                                for(i; i < Object.keys(recipes_copy).length; i++){
+                                    //add a new document to FB where each recipe's upcoming(remaining) steps will be saved and changed and retrieved
+                                    await db.collection("upcoming-recipes").add({"to_do_steps_instance_FBID": to_do_steps_instance_FBID})
+                                        // eslint-disable-next-line no-loop-func
+                                        .then((docRef) => {
+                                            console.log("Document written with ID: ", docRef.id);
+                                            
+                                            upcoming_recipes_copy[i+1] = docRef.id;
+                                            set_upcoming_recipes_FBIDs_dictionary(upcoming_recipes_copy);
+                                            set_upcoming_recipes_FBIDs_array(upcoming_recipes_FBIDs =>[...upcoming_recipes_FBIDs, docRef.id])
+
+                                        // eslint-disable-next-line no-loop-func
+                                        }).then(()=>{
+                                            db.collection("to-do-steps").doc(to_do_steps_instance_FBID)
+                                            .update(upcoming_recipes_copy)
+                                        })
+                                }
+                            }).then(()=>{
+                                stovePreliminary(to_do_steps_instance_FBID, recipes_copy).then(()=>{
+                                    set_last_instruction_in_stage(true)
+                                    setLoadAlgo_check(false)
+                                    resolve()
+                                })
+                            })
+                        }else if (chosen_activity === "PREPPING"){
+                            let i = 0
+                            let meals_to_prep_copy = {}
+                            for(i; i < cust_emails.length; i++){
+                                let j = 0;
+                                for(j; j < chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"].length; j++){
+                                    if(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]["Name"] in meals_to_prep_copy){
+                                        let meal_name = chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]["Name"]
+                                        meals_to_prep_copy[meal_name]["num_meals"] = meals_to_prep_copy[meal_name]["num_meals"] + 1
+                                        
+                                    }else{
+                                        let meal_name = chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]["Name"]
+                                        meals_to_prep_copy[meal_name] = {"num_meals": 1, "status": "AWAITING_PREP"}
+                                    }
+
+                                }
+                            }
+                            // db.collection("orders").doc(chosen_order_id).update({
+                            //     "meals_to_prep": meals_to_prep_copy
+                            // }).then(()=>{
+                                set_meals_to_prep(meals_to_prep_copy)
+                                console.log("done setting prep")
+                                set_last_instruction_in_stage(true)
+                            // })
+                            
+                            setLoadAlgo_check(false)
+                            resolve()
+                        }else if(chosen_activity === "PACKING"){
+                            let packing_object_copy = {}
+                            console.log("About to set to packing")
+                            const cust_emails =  Object.keys(chosen_order_data["customer_order_data"]).sort()
+                            let i = 0;
+                            for(i; i < cust_emails.length; i++){
+                                let j = 0;
+                                for(j; j < chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"].length; j++){
+                                    
+                                    if(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]["Status"] === "AWAITING_PACKING"){
+                                        if((chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString()) in packing_object_copy){
+                                            console.log("packing obj after addition: ", JSON.stringify(packing_object_copy))
+                                            // let newArray = packing_object_copy[cust_emails[i]]
+                                            // newArray.push(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j])
+                                            packing_object_copy[chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString()].push(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j])
+                                        }else{
+                                            
+                                            packing_object_copy[chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString()] = [chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]]
+                                        }
+                                    }
+                                }
+                            }
+                            set_packing_object(packing_object_copy)
+                            set_last_instruction_in_stage(true)
+                            setLoadAlgo_check(false)
+                            resolve()
+                        }else if(chosen_activity === "VIEW_ORDERS"){
+                            let packing_object_copy = {}
+                            let meals_to_prep_copy = {}
+                            console.log("About to set to packing")
+                            const cust_emails =  Object.keys(chosen_order_data["customer_order_data"]).sort()
+                            let i = 0;
+                            for(i; i < cust_emails.length; i++){
+                                let j = 0;
+                                for(j; j < chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"].length; j++){
+                                    
+                                    if( ( chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString() ) in packing_object_copy){
+                                        console.log("packing obj after addition: ", JSON.stringify(packing_object_copy))
+                                        // let newArray = packing_object_copy[cust_emails[i]]
+                                        // newArray.push(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j])
+                                        packing_object_copy[chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString()].push(chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j])
+                                    }else{
+                                        
+                                        packing_object_copy[chosen_order_data["customer_order_data"][cust_emails[i]]["Shipping_Name"].toString() + ', ' + cust_emails[i].toString()] = [chosen_order_data["customer_order_data"][cust_emails[i]]["Selected_Meals"][j]]
+                                    }
+                                }
+                            }
+                            if(i === cust_emails.length){
+                                let m = 0
+                                
+                                for(m; m < cust_emails.length; m++){
+                                    let n = 0;
+                                    for(n; n < chosen_order_data["customer_order_data"][cust_emails[m]]["Selected_Meals"].length; n++){
+                                        if(chosen_order_data["customer_order_data"][cust_emails[m]]["Selected_Meals"][n]["Name"] in meals_to_prep_copy){
+                                            let meal_name = chosen_order_data["customer_order_data"][cust_emails[m]]["Selected_Meals"][n]["Name"]
+                                            meals_to_prep_copy[meal_name]["num_meals"] = meals_to_prep_copy[meal_name]["num_meals"] + 1
+                                            meals_to_prep_copy[meal_name]["customers_who_ordered"].push(chosen_order_data["customer_order_data"][cust_emails[m]]["Shipping_Name"])
+                                        }else{
+                                            let meal_name = chosen_order_data["customer_order_data"][cust_emails[m]]["Selected_Meals"][n]["Name"]
+                                            meals_to_prep_copy[meal_name] = {"num_meals": 1, "status": "AWAITING_PREP", "customers_who_ordered": [chosen_order_data["customer_order_data"][cust_emails[m]]["Shipping_Name"]]}
+                                        }
+
+                                    }
+                                }
+                            }
+                            set_cust_all_orders_obj_by_name(packing_object_copy)
+                            set_cust_all_orders_obj_by_meal(meals_to_prep_copy)
+                            set_last_instruction_in_stage(true)
+                            setLoadAlgo_check(false)
+                            resolve()
+                        }   
+                    })         
+
                 })
                             
             })
@@ -826,19 +978,20 @@ useEffect(()=>{
     // CONTAIN THE UPCOMING RECIPE STEPS FOR EACH STOVE ASSIGNED
     // RECIPE. HOB NUMBER IS ALSO SET FOR EACH RECIPE HERE
     //=====================================================
-    function stovePreliminary(FBID){
+    function stovePreliminary(FBID, recipes_to_cook){
         return new Promise(async (resolve, reject)=>{
             // set_on_screen_instruction(null)
             // set_current_instruction_object(null)
 
             // let recipes = {1: recipe1, 2: recipe2, 3: recipe3, 4: recipe4}
+            console.log("recipes at stove-prelim: ", recipes_to_cook)
             
             let i = 1;
-            for(i; i <= Object.keys(recipes).length; i++){
+            for(i; i <= Object.keys(recipes_to_cook).length; i++){
                 let j = 0 ;
                 let holderArray = []
-                for(j; j < recipes[i]["stove-steps"].length; j++){
-                    holderArray.push({"upcoming_recipe_FBID": upcoming_recipes_FBIDs_dictionary[i], "hob-number": i, "recipe-number": recipes[i]["recipe-number"], "recipe-name": recipes[i]["name"], "step-info": recipes[i]["stove-steps"][j]})
+                for(j; j < recipes_to_cook[i]["stove-steps"].length; j++){
+                    holderArray.push({"upcoming_recipe_FBID": upcoming_recipes_FBIDs_dictionary[i], "hob-number": i, "recipe-number": recipes_to_cook[i]["recipe-number"], "recipe-name": recipes_to_cook[i]["name"], "step-info": recipes_to_cook[i]["stove-steps"][j]})
                 }
             
                 await db.collection("upcoming-recipes").doc(upcoming_recipes_FBIDs_dictionary[i]).set({
@@ -848,10 +1001,10 @@ useEffect(()=>{
                 })
                 
             }
-            if(i === Object.keys(recipes).length + 1){
+            if(i === Object.keys(recipes_to_cook).length + 1){
                 set_background_update(background_update + 1)
                 // set_current_instruction_object(null)
-                setStage("BASE")
+                // setStage("BASE")
                 resolve()
             }
         })
@@ -861,7 +1014,7 @@ useEffect(()=>{
 
 
     function stoveSecondary(){
-
+        console.log("recipes at stove-sec: ", recipes)
         console.log("running stove func ")
         
         
@@ -979,12 +1132,42 @@ useEffect(()=>{
     function stageComplete(){
         console.log("running stage complete")
 
-        if(stage === "LOAD"){
-            console.log("setting stage to base")
-            setStage('BASE')
+        if(stage === null){
+            setStage("REQUIREMENTS")
+            set_last_instruction_in_stage(false)
+            return null
+        }else if(stage === "REQUIREMENTS"){
+            console.log("setting stage to load")
+            set_app_starting(true)
+            setStage('LOAD')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
+        }else if(stage === "LOAD"){
+            set_app_starting(false)
+            if(chosen_activity === "PREPPING"){
+                console.log("setting stage to prepping")
+                setStage('PREPPING')
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }else if(chosen_activity === "COOKING"){
+                console.log("setting stage to base")
+                setStage('BASE')
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }else if(chosen_activity === "PACKING"){
+                setStage("PACKING")
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }else if(chosen_activity === "VIEW_ORDERS"){
+                setStage("VIEW_ORDERS")
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }
         }else if(stage === 'BASE'){
             console.log("setting stage to pre-heat")
             setStage('PRE-HEAT')
@@ -994,22 +1177,23 @@ useEffect(()=>{
         }
         else if(stage === 'PRE-HEAT'){
             console.log("setting stage to retrieval")
-            setStage('RETRIEVAL')
-            set_last_instruction_in_stage(false)
-            set_instruction_stage(1)
-            set_recipe_cycle_number(1)
-        }
-        else if(stage === 'RETRIEVAL'){
+            if(chosen_activity === "COOKING"){
+                setStage("OVEN")
+                set_last_instruction_in_stage(false)
+                set_instruction_stage(1)
+                set_recipe_cycle_number(1)
+            }
+            
+        }else if(stage === 'RETRIEVAL'){
             console.log("setting stage to prep")
             setStage('PREP')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
-        }
-        else if(stage === 'PREP'){
+        }else if(stage === 'PREP'){
             // setStage('QUEUE_NEXT_STEP')
             console.log("setting stage to oven")
-            setStage('OVEN')
+            setStage('PREP_DONE')
             set_last_instruction_in_stage(false)
             set_instruction_stage(1)
             set_recipe_cycle_number(1)
@@ -1081,10 +1265,7 @@ useEffect(()=>{
 
                     prep()
                 }
-                // else if(stage === 'QUEUE_NEXT_STEP'){
-                //     QueueNextStep()
-                //     setStage("OVEN")
-                // }
+
                 else if(stage === 'OVEN'){
                     console.log("program chosen: oven")
                     oven()
@@ -1124,9 +1305,169 @@ useEffect(()=>{
 
                 <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
                     <Col>
-                        <h1>Please select recipes then press Start button to begin</h1>
+                        <h1>Which activity will you be completing?</h1>
                     </Col>
                 </Row>
+
+                <Modal show={show_customer_orders_modal}>
+                    <Modal.Header>
+                        <Modal.Title>Select Existing Orders or Input New via CSV</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    {deleted_cust_orders && <Alert severity="success">Successfully Deleted!</Alert>}
+
+                    <input id="image-file" type="file" accept=".csv" onChange={(e)=>{set_csv_data(e)}} />
+                    <br/>
+                    <br/>
+                    {csv_data && <Button onClick={()=>{
+                        // db.collection('orders').add({"ID": 1}).then(()=>{
+                        //     set_upload_button(false)
+                        if(csv_data){
+                            const cust_data_label = window.prompt("Provide a name for this data")
+                            if(cust_data_label && cust_data_label !== ""){
+                                console.log("labelled as: ", cust_data_label)
+                                Papa.parse(csv_data.target.files[0], {
+                                    header: true,
+                                    skipEmptyLines: true,
+                                    complete: function (results) {
+                                        console.log(results.data)
+                                        let temp_orders = {}
+                                        let i=0
+                                        for(i; i < results.data.length; i++ ){
+                                            if(results.data[i]["Email"].includes('.com')){
+                                                if(!(results.data[i]["Email"] in temp_orders)){
+                                                
+                                                    temp_orders[results.data[i]["Email"]] = {
+                                                        "Selected_Meals": [],
+                                                        "Shipping_Name": results.data[i]["Shipping Name"] ,
+                                                        "Shipping_Street": results.data[i]["Shipping Street"],	
+                                                        "Shipping_Address1": results.data[i]["Shipping Address1"],	
+                                                        "Shipping_Address2": results.data[i]["Shipping Address2"],	
+                                                        "Shipping_City": results.data[i]["Shipping City"],	
+                                                        "Shipping_Zip": results.data[i]["Shipping Zip"]
+                                                    }
+                                                        
+                                                    
+                                                }else{
+                                                    if(results.data[i]["Email"]){
+                                                        temp_orders[results.data[i]["Email"]]["Selected_Meals"].push({"Name": results.data[i]["Lineitem name"], "Status": "AWAITING_PREP"})
+                                                    }
+                                                    
+                                                }
+                                            }
+                                            
+                                        }
+                                        if(i === results.data.length){
+                                            set_customer_order_data(temp_orders)
+                                            console.log("modified customer order data: ", customer_order_data)
+                                            console.log("temp customer order data: ", temp_orders)
+                                            console.log({
+                                                "customer_order_data": temp_orders,
+                                                "labelled_as": cust_data_label,
+                                                "last_edited": Date.now(),
+                                                "meals_to_prep": "N/A"
+                                            })
+                                            db.collection('orders').add({
+                                                "customer_order_data": temp_orders,
+                                                "labelled_as": cust_data_label,
+                                                "last_edited": Date.now(),
+                                                "meals_to_prep": "N/A"
+                                            }).then(()=>{
+                                                // set_upload_button(false)
+        
+                                            }).catch((error)=>{
+                                                console.log("error...")
+                                                window.alert("Error uploading document, please try again:", error)
+                                            })
+                                    
+                                      
+                                        }
+                                    }
+                                })
+                            }else{
+                                window.alert("Please label the data")
+                            }
+                        }
+                       
+                        // })
+                    }}>
+                        Upload
+                    </Button>}
+                    <br/>
+
+                        {customer_orders && customer_orders.map((item, index)=>{
+                            return(
+                                <div style={{"margin":"4px"}}>
+                                <a style={{"display":"inline-block"}}  href='#' onClick={()=>{
+                                    set_chosen_order_data(item.data)
+                                    set_chosen_order_id(item.id)
+                                    console.log("order data set: ", chosen_order_data)
+
+                                    // if(chosen_order_data === null){
+                                    //     window.alert("Please select one of the orders listed or upload a new batch via CSV file")
+                                    // }else 
+                                    
+                                    if(chosen_activity === "COOKING"){
+                                        let selected_hob_number = parseInt(window.prompt("Please input the number of hobs you would like to use, the number must be between 1 and 12"))
+                                        console.log("type of selected hob number:" , typeof(selected_hob_number))
+                                        if( !(isNaN(selected_hob_number)) ){
+                                            if( (selected_hob_number > 12) || (selected_hob_number < 1) ){
+                                                window.alert("Please type a number between 1 and 12")
+                                            }else{
+                                                console.log("selected hob number: ", selected_hob_number)
+                                                set_num_hobs_chosen(selected_hob_number)
+                                                set_receipe_total(selected_hob_number)
+                                                set_show_customer_orders_modal(false)
+                                                set_last_instruction_in_stage(true)
+                                            }
+                                        }
+                                        else{
+                                            window.alert("Please type a number between 1 and 12")
+                                        }
+                                        
+                                    }else{
+                                        set_show_customer_orders_modal(false)
+                                        set_last_instruction_in_stage(true)
+                                    }
+                                    
+                                }} key={index}>
+                                    <h4> <span> {item.data["labelled_as"]} </span></h4>
+                                </a> <Button style={{"display":"inline-block"}} variant='outlined' color='error' onClick={(()=>{
+                                    let delete_check = window.confirm("Are you sure you want to delete this?")
+                                    if(delete_check){
+                                        db.collection("orders").doc(item.id).delete().then(() => {
+                                            set_deleted_cust_orders(true)
+                                            setTimeout(()=>{
+                                                set_deleted_cust_orders(false)
+                                            }, 4000)
+                                        
+                                        console.log("Document successfully deleted!");
+                                        }).catch((error) => {
+                                            console.error("Error removing document: ", error);
+                                        });
+                                    }
+                                    
+                                })}>Delete</Button>
+                                <br/>
+                                </div>
+                                
+                                )
+                        })}
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button onClick={()=>{set_show_customer_orders_modal(false)}}>
+                            Close
+                        </Button>
+
+                        {/* <Button onClick={()=>{
+                            
+                        }}>
+                            Begin
+                        </Button> */}
+                        
+                    </Modal.Footer>
+                </Modal>
 
                 <br/>
                 <br/>
@@ -1136,107 +1477,41 @@ useEffect(()=>{
                 <Row>
                     <Col>
                         <Button onClick={()=>{
-                            if(selected_recipes.length < 12){
-                                set_recipe_selection_modal(true)
-                                console.log("recipes are: ", JSON.stringify(database_recipes))
-                                set_recipes_selected(true)
-                            }else{
-                                alert("Maximum number of recipes to select is 12")
-                            }
+                           set_show_customer_orders_modal(true)
+                           set_chosen_activity("PREPPING")
                         }}
                         variant='contained'
-                        color='success'
+                        color='primary'
                         >
-                            Select Recipes
+                            Prepping
                         </Button>
                         <br/>
 
-                        <Modal 
-                        show={recipe_selection_modal} 
-                        onHide={()=>{set_recipe_selection_modal(false)}}
-                        size="lg"
-                        style={{"maxHeight": "80vh"}}
-                        scrollable={true}
-                        >
-                        
-                        <Modal.Header closeButton>
-                            <Modal.Title>Recipes</Modal.Title>
-                        </Modal.Header>
-                        
-                        <Modal.Body>
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
-                            <InputLabel id="demo-simple-select-label">Recipes</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value=""
-                                    label="Recipes"
-                                    onChange={(e)=>{console.log(e)
-                                        set_selected_recipes(selected_recipes => [...selected_recipes, e.target.value])
-                                        set_recipe_selection_modal(false)
-                                    }}
-                                >
-                                    {database_recipes.map((item, index)=>{
-                                        return(
-                                            <MenuItem key={index} value={item}>{item.name}</MenuItem>
-                                        )
-                                    })}
-                                    
-                                    
-                                </Select>
-                            </FormControl>
-                        </Modal.Body>
-                        
-                        </Modal>
-
-                        <br/>
-                        <br/>
-                        <CardRB>
-                            <CardRB.Header>Total: {selected_recipes.length}</CardRB.Header>
-                            {console.log("selected array: ", selected_recipes)}
-                            <CardRB.Body style={{"overflowY": "scroll"}}>
-                                {selected_recipes.map((item, index)=>{
-                                    return(
-                                        <li 
-                                            key={index}>{item.name} <Button variant="outlined" color="error" onClick={(()=>{
-                                                let selected_recipes_copy = selected_recipes.filter(
-                                                    (recipe, recipe_index) => recipe_index !== index
-                                                )
-                                                set_selected_recipes(selected_recipes_copy)
-                                            })}>
-                                                                        Remove
-                                                                    </Button>
-                                        </li>
-                                    )
-                                })}
-                            </CardRB.Body>
-                        </CardRB>
-                    </Col>
-                </Row>
-
-
-                <br/>
-                <br/>
-
-                <Row>
-                    <Col>
-                        { (instruction_stage === 0 && recipe_cycle_number === 0 ) && <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                            if(recipes_selected){
-                                setStage('REQUIREMENTS')
-                                set_app_starting(true)
-                                set_receipe_total(selected_recipes.length)
-                                // set_instruction_stage(instruction_stage + 1)
-                                // set_recipe_cycle_number(recipe_cycle_number + 1) 
-                            }else{
-                                window.alert("Please select a recipe before starting")
-                            }
-                            
-                            // program()
-                            
-                            setNextClick(true)
-                            }}> Start 
+                        <Button style={{"margin": "10px"}} variant="contained" color='error' onClick={()=>{
+                            set_show_customer_orders_modal(true)
+                            set_chosen_activity("COOKING")
+                            }}> Cooking 
                         </Button>
-                        }
+                        <br/>
+
+                        <Button variant='contained' color='success'
+                            onClick={()=>{
+                                set_show_customer_orders_modal(true)
+                                set_chosen_activity("PACKING")
+                            }}
+                        >
+                            Packing
+                        </Button>
+                        <br/>
+                        <br/>
+                        <Button variant='contained' color='success'
+                            onClick={()=>{
+                                set_show_customer_orders_modal(true)
+                                set_chosen_activity("VIEW_ORDERS")
+                            }}
+                        >
+                            View All Customer Orders
+                        </Button>
                     </Col>
                 </Row>
             </div>
@@ -1247,7 +1522,19 @@ useEffect(()=>{
 
     else if(stage === "REQUIREMENTS"){
         return(
+            
             <div style={{"padding": "15px"}} >
+                <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                
                 <h1 style={{"color": "#FF9F33"}}>Actual</h1>
 
                 <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
@@ -1310,15 +1597,138 @@ useEffect(()=>{
                 <br/>
                 
                 <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                    setStage("LOAD")
-                    set_app_starting(true)
+                    // // setStage("LOAD")
+                    // set_app_starting(true)
                     // set_instruction_stage(instruction_stage + 1)
                     // set_recipe_cycle_number(recipe_cycle_number + 1)
                     // program()
-                    
+                    set_last_instruction_in_stage(true)
                     setNextClick(true)
                 }}>Next</Button>
             </div>
+        )
+    }
+
+    else if(stage === "PREPPING"){
+        console.log("meals to prep at prepping: ", meals_to_prep)
+        return(
+            <div>
+                <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                    <br/>
+                {   
+                    Object.keys(meals_to_prep).sort().map((item, index)=>{
+                        let text_colour = 'black'
+                        return(
+                            <div style={{"border": "solid", "margin": "60px"}}>
+                                <a href="#" onClick={()=>{set_prep_modal(true)
+                                    console.log("recipes: ", recipes)
+                                        let i = 1;
+                                        for(i; i < Object.keys(recipes).sort().length; i++){
+                                            if(recipes[i]["name"] === item){
+                                                set_retrieval_steps(recipes[i]["retrieval-steps"])
+                                                set_prep_steps(recipes[i]["prep-steps"])
+                                                set_retrieval_stage(true)
+                                            }
+                                        }
+                                    }
+                                } 
+                                key={index}
+                                style={{"color": (meals_to_prep[item]["status"] === "AWAITING_PREP") ? 'black' : 'green'}} 
+                                >
+                                    <span> <u>{item}: {meals_to_prep[item]["num_meals"]}</u></span>
+                                </a>
+                                <Button onClick={(()=>{
+                                    // console.log(meals_to_prep)
+                                    let meals_to_prep_copy = meals_to_prep
+                                    meals_to_prep_copy[item]["status"] = "AWAITING_COOKING"
+                                    set_meals_to_prep(meals_to_prep_copy)
+                                    set_last_instruction_in_stage(!last_instruction_in_stage)
+
+                                    // console.log(meals_to_prep)
+                                    // db.collection("orders").doc(chosen_order_id)
+                                    // .update({item: {"status": "AWAITING_COOKING", "num_meals": meals_to_prep_copy[item]["num_meals"]}})
+                                    // .then(()=>{
+                                    //     // text_colour = 'green'
+                                    //     set_last_instruction_in_stage(!last_instruction_in_stage)
+                                    // })
+                                    
+                                    })}>
+                                    Done
+                                </Button>
+                            </div>
+                        )
+                    })
+                }
+
+                <Modal show={prep_modal} onHide={(()=>{set_prep_modal(false)})}>
+                    <Modal.Header>
+                        {prep_stage && <h2> <u>Prep Steps</u> </h2>}
+                        {retrieval_stage && <h2> <u>Retrieval Steps</u> </h2>}
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        {prep_stage && 
+                            (prep_steps.length > 0 ? <h3>{prep_steps[step_counter]["instruction"]}</h3> : <h3>No prep steps</h3>)
+                        }
+                        {retrieval_stage && 
+                            (retrieval_steps.length > 0 ? <h3>{retrieval_steps[step_counter]["instruction"]}</h3> : <h3>No retrieval steps</h3>)
+                        }
+                    </Modal.Body>
+
+                    
+
+                    <Modal.Footer>
+                        <Button onClick={()=>{set_prep_modal(false)}}>
+                            Close
+                        </Button>
+                        <Button onClick={(()=>{
+                            if(prep_stage && (step_counter === 0)){
+                                set_prep_stage(false)
+                                set_step_counter(retrieval_steps.length - 1)
+                                set_retrieval_stage(true)
+                            }else{
+                                if(step_counter === 0){
+                                    return null
+                                }else{
+                                    set_step_counter(step_counter - 1)
+                                }
+                            }
+                        })}>
+                            Previous
+                        </Button>
+                        <Button onClick={(()=>{
+                            if(retrieval_stage && (step_counter === retrieval_steps.length - 1) ){
+                                set_retrieval_stage(false)
+                                set_step_counter(0)
+                                set_prep_stage(true)
+                            }else{
+                                if(retrieval_stage){
+                                    set_step_counter(step_counter + 1)
+                                }else{
+                                    if(step_counter === prep_steps.length - 1){
+                                        return null
+                                    }else{
+                                        set_step_counter(step_counter + 1)
+                                    }
+                                }
+                            }
+                        })}>
+                            Next
+                        </Button>
+                        
+                    </Modal.Footer>
+                </Modal>
+            </div>
+            
         )
     }
 
@@ -1335,7 +1745,7 @@ useEffect(()=>{
                <div>
                     <h1 style={{"color": "#FF9F33"}}>Actual</h1>
                     <Spinner animation="border"/>
-                    <h2>Loading Steps...</h2>
+                    <h2>Loading, please wait...</h2>
                 </div> 
             </div>
             
@@ -1343,6 +1753,17 @@ useEffect(()=>{
             :
 
             <div style={{"padding": "15px"}} >
+                <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                {console.log("stage is: ", stage)}
                 <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
                 <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
                     <Col>
@@ -1491,6 +1912,16 @@ useEffect(()=>{
             
             <Container>
                 <div style={{"padding": "15px"}} >
+                <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
                     <h1 style={{"color": "#FF9F33"}}>Actual</h1>                
                     <Row style={{"border": "solid", "borderColor": "#FF9F33", "padding": "10px", "backgroundColor": "#FF9F33", "color": "white"}}>
                         <Col>
@@ -1518,8 +1949,9 @@ useEffect(()=>{
 
                         <Col>
                             <Button style={{"margin": "10px"}} variant="contained" onClick={()=>{
-                                setStage("RETRIEVAL")
+                                // setStage("RETRIEVAL")
                                 
+                                set_last_instruction_in_stage(true)
                                 // set_instruction_stage(instruction_stage + 1)
                                 // set_recipe_cycle_number(1)
                                 // program()
@@ -1546,6 +1978,16 @@ useEffect(()=>{
             (
                 
                 <Container>
+                    <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
                     <h1 style={{"color": "#FF9F33"}}>Actual</h1>
                     {/* <Button variant='outlined' onClick={()=>{set_pop_over(!pop_over)}} aria-label="info">
                         Click for Orientation Info
@@ -1733,6 +2175,9 @@ useEffect(()=>{
 
                     {/* ACTUAL SCREEN LAYOUT STARTS HERE */}
                     <Row>
+
+                    {cooking_complete_alert && <Alert severity="success">Meals ready for packing</Alert>}
+
                         <Col lg={10} md={10} sm={10} style={{"border": "solid", "height": 0.15 * window.innerHeight, "margin": "auto"}}>
                             {consecutive_back_presses >= 0 ?
                                 (completed_steps.length > 0 && 
@@ -1775,7 +2220,53 @@ useEffect(()=>{
                                         </div>
                                         :
                                         <div>
-                                            {to_do_steps["finished"].length === Object.keys(recipes).length ?<h4>All recipes completed</h4> : <h4>Mix all meals whilst waiting for next step</h4>}
+                                            {to_do_steps["finished"].length === Object.keys(recipes).length ?
+                                                <div>
+                                                    <h4>All recipes completed</h4> 
+                                                    <Modal show={finished_cooking_modal}>
+                                                        <Modal.Body>
+                                                            <h2>Cooking finished, press complete button below to change meal status to packing!</h2>
+                                                        </Modal.Body>
+
+                                                        <Modal.Footer>
+                                                            <Button  onClick={()=>{set_finished_cooking_modal(false)}}>
+                                                                Close
+                                                            </Button>
+                                                            <Button onClick={(async ()=>{
+                                                                console.log("meals on hob: ", meals_on_hob)
+                                                                //ONCE CHEF CLICKS THIS BUTTON, SET COOKED MEALS' STATUS TO BE AWAITING_PACKING
+                                                                let chosen_order_data_copy = chosen_order_data
+                                                                let i = 0;
+                                                                for(i; i < meals_on_hob.length; i++){
+                                                                    let k = 0;
+                                                                    for(k; k < chosen_order_data["customer_order_data"][meals_on_hob[i]["Email"]]["Selected_Meals"].length; k++){
+                                                                        if(meals_on_hob[i]["Meal_Name"] === chosen_order_data["customer_order_data"][meals_on_hob[i]["Email"]]["Selected_Meals"][k]["Name"]){
+                                                                            chosen_order_data_copy["customer_order_data"][meals_on_hob[i]["Email"]]["Selected_Meals"][k]["Status"] = "AWAITING_PACKING"
+                                                                            chosen_order_data_copy["last_edited"] = Date.now()
+                                                                        }
+                                                                    }
+                                                                }
+                                                                db.collection("orders").doc(chosen_order_id).update(
+                                                                    chosen_order_data_copy
+                                                                ).then(()=>{
+                                                                    console.log("data sent to fb, id, copy: ", chosen_order_id, chosen_order_data_copy)
+                                                                    set_finished_cooking_modal(false)
+                                                                    set_cooking_complete_alert(true)
+                                                                    setTimeout(()=>{
+                                                                        set_cooking_complete_alert(false)
+                                                                    }, 10000)
+                                                                })
+                                                            })}
+                                                            
+                                                            >Complete</Button>
+                                                        </Modal.Footer>
+                                                        </Modal>
+                                                </div>
+                                                
+                                                
+                                                : 
+                                            
+                                            <h4>Mix all meals whilst waiting for next step</h4>}
                                             <br/>
                                             <br/>
                                             <br/>
@@ -1880,7 +2371,11 @@ useEffect(()=>{
                                         <h1>{item}</h1>
                                     </Col>
                                 )
-                           })}                         
+                           })} 
+                           
+                           
+
+
                         
                     </Row>
 
@@ -1888,6 +2383,192 @@ useEffect(()=>{
             )
               
         );
+        
+    }else if(stage === "PREP_DONE"){
+        return(
+            <div>
+                <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                    <br/>
+                <h1>PREP DONE</h1>
+            </div>
+        )
+    }else if(stage === "PACKING"){
+        console.log("packing object: ", JSON.stringify(packing_object))
+        if(Object.keys(packing_object).length > 0){
+            return(
+                <div>
+                    <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                    <br/>
+                    <h1>Packing Stage</h1>
+                    <br/>
+                    <br/>
+                    {Object.keys(packing_object).sort().map((name_and_email, index)=>{
+                        return(
+                            <div style={{"border": "solid", "margin": "10px"}}>
+                                <h2 key={index}> <u> <strong>{name_and_email}: </strong> </u> </h2>
+                                {packing_object[name_and_email].map((meal_object, meal_object_index)=>{
+                                    return(
+                                        <div>
+                                            <h4 style={{color: (meal_object["Status"] === "AWAITING_PACKING" ? 'black' : 'green')}} key={meal_object_index}>{meal_object["Name"]}</h4>
+                                            <Button onClick={(()=>{
+                                                let email = name_and_email.split(',')[1].replace(" ", "")
+                                                let chosen_order_data_copy = chosen_order_data
+                                                let i = 0;
+                                                for(i; i < chosen_order_data["customer_order_data"][email]["Selected_Meals"].length; i++){
+                                                    if(chosen_order_data["customer_order_data"][email]["Selected_Meals"][i]["Name"] === meal_object["Name"]){
+                                                        chosen_order_data_copy["customer_order_data"][email]["Selected_Meals"][i]["Status"] = "READY_TO_DELIVER"
+                                                    }
+                                                }
+                                                db.collection("orders").doc(chosen_order_id)
+                                                .update(chosen_order_data_copy)
+                                                .then(()=>{
+                                                    let i = 0;
+                                                    let packing_object_copy = packing_object
+                                                    for(i; i < packing_object[name_and_email].length; i++){
+                                                        if(packing_object[name_and_email][i]["Status"] === "AWAITING_PACKING"){
+                                                            packing_object_copy[name_and_email][i]["Status"] = "READY_TO_DELIVER"
+                                                            break
+                                                        }
+                                                    }
+                                                    set_packing_object(packing_object_copy)
+                                                })
+                                            })}>
+                                                Done
+                                            </Button>
+                                            <br/>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )
+                    })}
+                </div>
+            )
+        }else{
+            return(
+                <div>
+                    <Button onClick={()=>{setStage(null)
+                        set_chosen_activity(null)}}>
+                        Back
+                    </Button>
+                    <br/>
+                    <h1>Packing Stage</h1>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h2>
+                        Nothing to pack
+                    </h2>
+                </div>
+            )
+        }
+    }else if(stage === "VIEW_ORDERS"){
+        
+        if((chosen_order_view === "BY_NAME") || (chosen_order_view === null)){
+            return(
+                <div>
+                    <h1>Customer Orders</h1>
+                    <br/>
+                    <br/>
+                    <Button onClick={()=>{
+                        let home_check = window.confirm("Going back to the homepage will end your current activity and all progress will be lost. Do you still want to go back to the home page?")
+                        if(home_check){
+                            set_chosen_activity(null)
+                            setStage(null)
+                        }
+                    }}
+                    >
+                        Back to Home
+                    </Button>
+                    <br/>
+                    <br/>
+                    <Button onClick={()=>{
+                        set_chosen_order_view("BY_ORDER")
+                        
+                    }}>
+                        "View by Meal"
+                    </Button>
+                    <br/>
+                    <br/>
+
+                    {Object.keys(cust_all_orders_obj_by_name).sort().map((name_and_email, index)=>{
+                        console.log(cust_all_orders_obj_by_name)
+                            return(
+                                <div style={{"border": "solid", "margin": "10px"}} key={index}>
+                                    <h2 > <u> <strong>{name_and_email}: </strong> </u> </h2>
+                                    {cust_all_orders_obj_by_name[name_and_email].map((meal_object, meal_object_index)=>{
+                                        return(
+                                            <div key={meal_object_index}>
+                                                <h4 >{meal_object["Name"]}</h4>
+                                                <br/>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })}
+                </div>
+            )
+            
+
+        }else{
+            return(
+                <div>
+                    <h1>Customer Orders</h1>
+                    <br/>
+                    <Button onClick={()=>{setStage(null)
+                        set_chosen_activity(null)}}>
+                        Back
+                    </Button>
+                    <br/>
+                    <Button onClick={()=>{
+                        set_chosen_order_view("BY_NAME")
+                    }}>
+                        "View by Name"
+                    </Button>
+                    <br/>
+
+                    {   
+                        Object.keys(cust_all_orders_obj_by_meal).sort().map((item, index)=>{
+                            console.log(cust_all_orders_obj_by_meal)
+                            return(
+                                <div style={{"border": "solid", "margin": "50px"}}>
+                                    <h2>
+                                        <u> <stong> {item}: {cust_all_orders_obj_by_meal[item]["num_meals"]} </stong> </u>
+                                    </h2>
+                                    {cust_all_orders_obj_by_meal[item]["customers_who_ordered"].map((person, person_index)=>{
+                                        return(
+                                            <h4 >
+                                                {person}
+                                            </h4>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            )
+            
+        }
         
     }
 

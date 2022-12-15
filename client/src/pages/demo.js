@@ -1267,7 +1267,6 @@ useEffect(()=>{
                                 set_receipe_total(selected_recipes.length)
                                 set_prep_cook_modal(false)
                                 
-                                
 
                             }}>Begin</Button>
                     </Modal.Footer>
